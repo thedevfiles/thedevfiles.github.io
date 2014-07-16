@@ -4,7 +4,7 @@
   <title><![CDATA[The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-07-15T21:31:19-07:00</updated>
+  <updated>2014-07-15T21:39:39-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,43 +12,5 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Test Post]]></title>
-    <link href="http://www.thedevfiles.com/blog/test-post/"/>
-    <updated>2013-11-11T19:11:00-08:00</updated>
-    <id>http://www.thedevfiles.com/blog/test-post</id>
-    <content type="html"><![CDATA[<p>This is my post.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nb">phpinfo</span><span class="p">();</span>
-</span><span class='line'><span class="k">foreach</span> <span class="p">(</span><span class="nv">$array</span> <span class="k">as</span> <span class="nv">$item</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">echo</span> <span class="nv">$item</span><span class="p">[</span><span class="s1">&#39;hat&#39;</span><span class="p">];</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>Javascipt </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">el</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;header&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">header</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<div class="embed-video-container"><iframe src="http://www.youtube.com/embed/QRmmISj6Rrw "></iframe></div>
-
-
-<div class="embed-video-container"><iframe src="http://player.vimeo.com/video/82927717 "></iframe></div>
-
-]]></content>
-  </entry>
   
 </feed>
