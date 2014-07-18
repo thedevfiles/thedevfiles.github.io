@@ -1,8 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
+        <loc>http://www.thedevfiles.com/atom_search.xml</loc>
+        <lastmod>2014-07-17T20:20:34-07:00</lastmod>
+    </url>
+    <url>
         <loc>http://www.thedevfiles.com/blog/archives/</loc>
         <lastmod>2014-04-17T19:54:40-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://www.thedevfiles.com/contact/</loc>
+        <lastmod>2014-07-16T19:00:22-07:00</lastmod>
     </url>
     <url>
         <loc>http://www.thedevfiles.com/</loc>
@@ -11,5 +19,9 @@
     <url>
         <loc>http://www.thedevfiles.com/robots.txt</loc>
         <lastmod>2014-04-17T19:54:40-07:00</lastmod>
+    </url>
+    <url>
+        <loc>http://www.thedevfiles.com/search.html</loc>
+        <lastmod>2014-07-17T20:20:49-07:00</lastmod>
     </url>
 </urlset>
