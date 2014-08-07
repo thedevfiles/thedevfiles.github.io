@@ -9,7 +9,7 @@
   <meta name="author" content="Jonathan Bernardi">
 
   
-  <meta name="description" content=" Blog Archives Jonathan Bernardi <!-- &#8211;> Recent Posts Google+ Categories ">
+  <meta name="description" content="The mysql extension has been marked as depricated as of php 5.5.0 and will be removed completely in a future version. ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -29,6 +29,7 @@
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
 </head>
 
 <body   >
@@ -45,9 +46,10 @@
   
 </ul>
 
-  <form method="get" action="/search.html">
+  <form action="https://www.google.com/search" method="get">
     <fieldset role="search">
-      <input class="search" name="query" type="text" placeholder="Search..." x-webkit-speech />
+      <input type="hidden" name="q" value="site:www.thedevfiles.com" />
+      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
     </fieldset>
   </form>
 
@@ -62,6 +64,50 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/07/moving-from-mysql-query-to-pdo/">Moving from mysql_query to PDO</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-07-28T20:01:33-07:00" pubdate data-updated="true">Jul 28<span>th</span>, 2014</time>
+        
+           | <a href="/2014/07/moving-from-mysql-query-to-pdo/#disqus_thread"
+             data-disqus-identifier="http://www.thedevfiles.com/2014/07/moving-from-mysql-query-to-pdo/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>The mysql extension has been marked as depricated as of php 5.5.0 and will be removed completely in a future version.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2014/07/moving-from-mysql-query-to-pdo/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   <div class="pagination">
     
@@ -79,28 +125,29 @@
     </div>
     <div class="social-media">
         
-            <a href="https://twitter.com/thejonbernardi" title="Twitter"><i class="fa fa-twitter"></i></a>
+            <a target="_blank" href="https://twitter.com/thejonbernardi" title="Twitter"><i class="fa fa-twitter"></i></a>
         
         
         
-            <a href="https://plus.google.com/116642652326925126482" title="Google+"><i class="fa fa-google-plus"></i></a>
-        
-        <!--
+            <a target="_blank" href="https://plus.google.com/116642652326925126482" title="Google+"><i class="fa fa-google-plus"></i></a>
         
         
         
-            <a href="https://github.com/spekkionu" title="Github"><i class="fa fa-github"></i></a>
+            <a target="_blank" href="http://www.linkedin.com/pub/jonathan-bernardi/57/318/99a" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
         
         
+            <a target="_blank" href="https://github.com/spekkionu" title="Github"><i class="fa fa-github"></i></a>
         
         
-        
-        &#8211;>
     </div>
 </section>
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2014/07/moving-from-mysql-query-to-pdo/">Moving from mysql_query to PDO</a>
+      </li>
     
   </ul>
 </section>
@@ -117,7 +164,10 @@
 
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"></ul>
+    <ul id="category-list"><li><a href='/category/mysql'>mysql (1)</a></li><li><a href='/category/pdo'>pdo (1)</a></li><li><a href='/category/php'>php (1)</a></li></ul>
+</section><section>
+  <h1>Monthly Archives</h1>
+  <div class="monthly_archive"><ul class="year_list"><li class="year">2014 (1)</li><ul class="month_list"><li class="month"><a href='/2014/07/'>JUL (1)</a></li></ul></ul></div>
 </section>
   
 </aside>
@@ -146,15 +196,6 @@
 </script>
 
 
-
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) {return;}
-  js = d.createElement(s); js.id = id; js.async = true;
-  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
 
 
 
@@ -193,6 +234,7 @@
 </script>
 
 
+<script src="/javascripts/monthly_archive.min.js"></script>
 
 </body>
 </html>

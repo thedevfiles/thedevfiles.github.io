@@ -4,7 +4,7 @@
   <title><![CDATA[The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-07-28T19:59:48-07:00</updated>
+  <updated>2014-08-06T18:27:44-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,5 +12,339 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Moving from mysql_query to PDO]]></title>
+    <link href="http://www.thedevfiles.com/2014/07/moving-from-mysql-query-to-pdo/"/>
+    <updated>2014-07-28T20:01:33-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/07/moving-from-mysql-query-to-pdo</id>
+    <content type="html"><![CDATA[<p>The mysql extension has been marked as depricated as of php 5.5.0 and will be removed completely in a future version.</p>
+
+<!--more-->
+
+
+<h2>Connecting to a Database</h2>
+
+<h3>Connecting with mysql_connect</h3>
+
+<figure class='code'><figcaption><span>mysql_connect</span><a href='http://us2.php.net/manual/en/function.mysql-connect.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$link</span> <span class="o">=</span> <span class="nb">mysql_connect</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nb">mysql_select_db</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">,</span> <span class="nv">$link</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <a href="http://us3.php.net/manual/en/function.mysql-connect.php">mysql_connect</a> function returns a MySQL link identifier if the database connection was sucessful or FALSE if the connection was not successful.<br/>
+After connecting to the database server the database must be selected before any queries can be run on it.<br/>
+This is done with the <a href="http://us3.php.net/manual/en/function.mysql-select-db.php">mysql_select_db</a> function.</p>
+
+<h3>Connecting with PDO</h3>
+
+<figure class='code'><figcaption><span>PDO</span><a href='http://us3.php.net/manual/en/pdo.construct.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$dbh</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PDO</span><span class="p">(</span><span class="s1">&#39;mysql:host=localhost;dbname=database&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <a href="http://us3.php.net/manual/en/pdo.construct.php">PDO contructor</a> accepts a <abbr title="Data Source Name">DSN</abbr> as the first parameter and the user and password as the second and third parameter.</p>
+
+<p>This will create a new PDO instance if successful or throw a <a href="http://us3.php.net/manual/en/class.pdoexception.php">PDOException</a> if the connection fails.<br/>
+I will go into error handling later on.</p>
+
+<h2>Running a Query</h2>
+
+<h3>Running a query with mysql_query</h3>
+
+<figure class='code'><figcaption><span>mysql_query</span><a href='http://us2.php.net/manual/en/function.mysql-query.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$result</span> <span class="o">=</span> <span class="nb">mysql_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM tablename&quot;</span><span class="p">,</span> <span class="nv">$link</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <a href="http://us3.php.net/manual/en/function.mysql-query.php">mysql_query</a> function accepts the sql query as a string for the first parameter and the mysql link identifier returned from the mysql_connect function as the second parameter.<br/>
+For a successfuly query it returns a resource for a query that would return a resultset such as a SELECT query and TRUE for a INSERT, UPDATE, or DELETE query.<br/>
+It returns FALSE if the query fails.</p>
+
+<h3>Running a query with PDO</h3>
+
+<figure class='code'><figcaption><span>PDO::query</span><a href='http://us3.php.net/manual/en/pdo.query.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM tablename&quot;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <a href="http://us3.php.net/manual/en/pdo.query.php">query</a> method on the PDO object accepts the sql query as its only parameter.<br/>
+By default it returns an instance of <a href="http://us3.php.net/manual/en/class.pdostatement.php">PDOStatement</a> if successful or FALSE if not.<br/>
+This can be changed my modifiying the error mode for the connection.  This will be explained further in the Handling Errors section.</p>
+
+<h2>Fetching Data</h2>
+
+<h3>Fetching a single row with mysql_fetch_assoc</h3>
+
+<figure class='code'><figcaption><span>mysql_fetch_assoc</span><a href='http://us2.php.net/manual/en/function.mysql-fetch-assoc.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$result</span> <span class="o">=</span> <span class="nb">mysql_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM users WHERE id = 1&quot;</span><span class="p">,</span> <span class="nv">$link</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$user</span> <span class="o">=</span> <span class="nb">mysql_fetch_assoc</span><span class="p">(</span><span class="nv">$result</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To get the data from a query you can use the mysql_fetch_* functions.
+To return the data as an associative array use the <a href="http://us3.php.net/manual/en/function.mysql-fetch-assoc.php">mysql_fetch_assoc</a> function.
+To return the data as a numeric indexed array use the <a href="http://us3.php.net/manual/en/function.mysql-fetch-row.php">mysql_fetch_row</a> function.
+To return the data as an object use the <a href="http://us3.php.net/manual/en/function.mysql-fetch-object.php">mysql_fetch_object</a> function.
+It will return the next row in the resultset or FALSE of there are no more rows.</p>
+
+<h3>Fetching a single row with PDO</h3>
+
+<figure class='code'><figcaption><span>PDOStatement::fetch</span><a href='http://us3.php.net/manual/en/pdostatement.fetch.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM users WHERE id = 1&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetch</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">FETCH_ASSOC</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can use the <a href="http://us3.php.net/manual/en/pdostatement.fetch.php">fetch</a> method on the <a href="http://us3.php.net/manual/en/class.pdostatement.php">PDOStatement</a> onject returned from the <a href="http://us3.php.net/manual/en/pdo.query.php">PDO::query</a> method.<br/>
+It accepts the fetch style as the first parameter.<br/>
+To return data as an associative array pass the PDO::FETCH_ASSOC constant.<br/>
+To return data as a numberic indexed array pass the PDO::FETCH_NUM constant.<br/>
+To return data as an object pass the PDO::FETCH_OBJ constant.</p>
+
+<h3>Fetching all rows with mysql_fetch_assoc</h3>
+
+<figure class='code'><figcaption><span>mysql_fetch_assoc</span><a href='http://us2.php.net/manual/en/function.mysql-fetch-assoc.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$result</span> <span class="o">=</span> <span class="nb">mysql_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM users&quot;</span><span class="p">,</span> <span class="nv">$link</span><span class="p">);</span>
+</span><span class='line'><span class="k">while</span><span class="p">(</span><span class="nv">$row</span> <span class="o">=</span> <span class="nb">mysql_fetch_assoc</span><span class="p">(</span><span class="nv">$result</span><span class="p">)){</span>
+</span><span class='line'>    <span class="nv">$users</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$row</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To fetch all of the rows from a resultset you will need to loop through calling mysql_fetch_* until it returns false.<br/>
+This will result in an multi-dimensional associative array with all the records in the users table.</p>
+
+<h3>Fetching all rows with PDO::fetchAll</h3>
+
+<figure class='code'><figcaption><span>PDOStatement::fetchAll</span><a href='http://us3.php.net/manual/en/pdostatement.fetchall.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM users&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">FETCH_ASSOC</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There is no need to loop to pull an entire resultset with PDO.<br/>
+Just use the <a href="http://us3.php.net/manual/en/pdostatement.fetchall.php">PDOStatement::fetchAll</a> method passing the result style you want.</p>
+
+<h3>Getting the row id of the inserted record with mysql_insert_id</h3>
+
+<figure class='code'><figcaption><span>mysql_insert_id</span><a href='http://us2.php.net/manual/en/function.mysql-insert-id.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nb">mysql_query</span><span class="p">(</span><span class="s2">&quot;INSERT INTO users (first_name, last_name, email_address) VALUES (&#39;John&#39;, &#39;Doe&#39;, &#39;email@example.com&#39;)&quot;</span><span class="p">,</span> <span class="nv">$link</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$id</span> <span class="o">=</span> <span class="nb">mysql_insert_id</span><span class="p">(</span><span class="nv">$link</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After performing an insert query call <a href="http://us3.php.net/manual/en/function.mysql-insert-id.php">mysql_insert_id</a> to get the row id of the last inserted record.</p>
+
+<h3>Getting the row id of the inserted record with PDO::lastInsertId</h3>
+
+<figure class='code'><figcaption><span>PDO::lastInsertId</span><a href='http://us3.php.net/manual/en/pdo.lastinsertid.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;INSERT INTO users (first_name, last_name, email_address) VALUES (&#39;John&#39;, &#39;Doe&#39;, &#39;email@example.com&#39;)&quot;</span><span class="p">,</span> <span class="nv">$link</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$id</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">lastInsertId</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After performing an insert query call the <a href="http://us3.php.net/manual/en/pdo.lastinsertid.php">PDO::lastInsertId</a> method to get the row id of the last inserted record.</p>
+
+<h2>Handling Errors</h2>
+
+<p>How you handle errors is an important part of developing an application.<br/>
+It cannot be assumed that the database will always be up and every query will succeed.</p>
+
+<p>Without checking if a given query was successful the code will continue running assuming that was query was successful.<br/>
+This can lead to further problems with the application.<br/>
+For example if you have a user registration form that inserts the user into the database then sends out an activation email it makes no sense to send the email unless the account was created successfully.</p>
+
+<p>A lot of example code in the wild will use the <a href="http://us3.php.net/manual/en/function.die.php">die</a> function to exit the script when a mysql_* function fails printing the database error using the <a href="http://us2.php.net/manual/en/function.mysql-error.php">mysql_error</a> function.<br/>
+This is generally not the best way to handle errors.<br/>
+Printing the errors to the screen can expose information to the user than can compromise security.</p>
+
+<p>A better idea would be to log any errors that occur and show the user a human readable error message saying something went wrong either by redirecting them to an error page or showing the message on the current page.</p>
+
+<p>For the following examples I&rsquo;m going to assume that you have defined a function names handle_error that accepts an error message and error code.</p>
+
+<figure class='code'><figcaption><span>Error Logger</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * </span>
+</span><span class='line'><span class="sd"> * Logs error</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * @param string $message Human friendly error message</span>
+</span><span class='line'><span class="sd"> * @param string $error Error message returned from function or method that failed</span>
+</span><span class='line'><span class="sd"> * @param int $code Error code from failed function or method</span>
+</span><span class='line'><span class="sd"> * @param mixed $extra Any extra data you want to log.</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * @return void</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">function</span> <span class="nf">log_error</span><span class="p">(</span><span class="nv">$message</span><span class="p">,</span> <span class="nv">$error</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$code</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$extra</span> <span class="o">=</span> <span class="k">null</span><span class="p">){</span>
+</span><span class='line'>    <span class="c1">// This would log the error to an error log</span>
+</span><span class='line'>    <span class="c1">// You could use an existing logging library or use a simple fwrite.</span>
+</span><span class='line'>    <span class="c1">// For a good logging library I recommend monolog https://github.com/Seldaek/monolog</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Handling errors with mysql_connect and mysql_query</h3>
+
+<p>In general the mysql_* functions return FALSE when they fail.  After calling one of them you need to check the result to see if it was successful.</p>
+
+<p>The function <a href="http://us2.php.net/manual/en/function.mysql-error.php">mysql_error</a> will return a text error message of the last error that occurred and <a href="http://us2.php.net/manual/en/function.mysql-errno.php">mysql_errno</a> will return a numeric error code.</p>
+
+<figure class='code'><figcaption><span>mysql_connect</span><a href='http://us2.php.net/manual/en/function.mysql-error.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$link</span> <span class="o">=</span> <span class="nb">mysql_connect</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$link</span> <span class="o">===</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">log_error</span><span class="p">(</span><span class="s2">&quot;Failed to connect to database&quot;</span><span class="p">,</span> <span class="nb">mysql_error</span><span class="p">(),</span> <span class="nb">mysql_errno</span><span class="p">());</span>
+</span><span class='line'>    <span class="c1">// This would store the human readable message for the next request</span>
+</span><span class='line'>    <span class="nx">flash_message</span><span class="p">(</span><span class="s2">&quot;There was a problem connecting to the database. Please try again later.&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">// This could redirect to a separate error page or just to itself</span>
+</span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;location: error.php&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">mysql_select_db</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">,</span> <span class="nv">$link</span><span class="p">)</span> <span class="o">===</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">log_error</span><span class="p">(</span><span class="s2">&quot;Failed to select database&quot;</span><span class="p">,</span> <span class="nb">mysql_error</span><span class="p">(),</span> <span class="nb">mysql_errno</span><span class="p">());</span>
+</span><span class='line'>    <span class="c1">// This would store the human readable message for the next request</span>
+</span><span class='line'>    <span class="nx">flash_message</span><span class="p">(</span><span class="s2">&quot;There was a problem connecting to the database. Please try again later.&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">// This could redirect to a separate error page or just to itself</span>
+</span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;location: error.php&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can handle errors with queries much the same way.</p>
+
+<figure class='code'><figcaption><span>mysql_query</span><a href='http://us2.php.net/manual/en/function.mysql-error.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$result</span> <span class="o">=</span> <span class="nb">mysql_query</span><span class="p">(</span><span class="s2">&quot;INSERT INTO users (first_name, last_name, email_address) VALUES (&#39;John&#39;, &#39;Doe&#39;, &#39;email@example.com&#39;)&quot;</span><span class="p">,</span> <span class="nv">$link</span><span class="p">);</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$result</span> <span class="o">===</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">log_error</span><span class="p">(</span><span class="s2">&quot;Failed to insert user&quot;</span><span class="p">,</span> <span class="nb">mysql_error</span><span class="p">(),</span> <span class="nb">mysql_errno</span><span class="p">());</span>
+</span><span class='line'>    <span class="c1">// This would store the human readable message for the next request</span>
+</span><span class='line'>    <span class="nx">flash_message</span><span class="p">(</span><span class="s2">&quot;There was a problem creating your account. Please try again later.&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">// This could redirect to a separate error page or just to itself</span>
+</span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;location: error.php&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Handling errors with PDO</h3>
+
+<p>PDO has multiple ways of <a href="http://us3.php.net/manual/en/pdo.error-handling.php">handling errors</a>.</p>
+
+<p>There are three error modes for PDO.</p>
+
+<p>The first is PDO::ERRMODE_SILENT.<br/>
+This acts much like the mysql_* functions in that after calling a PDO method you need to check <a href="http://us3.php.net/manual/en/pdo.errorcode.php">PDO::errorCode</a> or <a href="http://us3.php.net/manual/en/pdo.errorinfo.php">PDO::errorInfo</a> to see if it was successful.</p>
+
+<p>The second error mode is PDO::ERRMODE_WARNING.<br/>
+This is much the same except an E_WARNING message is also thrown.</p>
+
+<p>The final error mode is PDO::ERRMODE_EXCEPTION.<br/>
+This one throws a <a href="http://us3.php.net/manual/en/class.pdoexception.php">PDOException</a> when an error occurs.
+This is the method I recommend and will be using it for further examples.</p>
+
+<figure class='code'><figcaption><span>Setting the Error Mode</span><a href='http://us3.php.net/manual/en/pdo.error-handling.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// You can set the error mode using the fourth options parameter on the constructor</span>
+</span><span class='line'><span class="nv">$dbh</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PDO</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span> <span class="nv">$user</span><span class="p">,</span> <span class="nv">$password</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">ATTR_ERRMODE</span> <span class="o">=&gt;</span> <span class="nx">PDO</span><span class="o">::</span><span class="na">ERRMODE_EXCEPTION</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// or you can use the setAttribute method to set the error mode on an existing connection</span>
+</span><span class='line'><span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">ATTR_ERRMODE</span><span class="p">,</span> <span class="nx">PDO</span><span class="o">::</span><span class="na">ERRMODE_EXCEPTION</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Connect with error handling</span><a href='http://us3.php.net/manual/en/pdo.error-handling.php'>docs</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$dbh</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PDO</span><span class="p">(</span><span class="nv">$dsn</span><span class="p">,</span> <span class="nv">$user</span><span class="p">,</span> <span class="nv">$password</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">ATTR_ERRMODE</span> <span class="o">=&gt;</span> <span class="nx">PDO</span><span class="o">::</span><span class="na">ERRMODE_EXCEPTION</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">PDOException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">log_error</span><span class="p">(</span><span class="s2">&quot;Failed to connect to database&quot;</span><span class="p">,</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(),</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getCode</span><span class="p">(),</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;exception&#39;</span> <span class="o">=&gt;</span> <span class="nv">$e</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Running a query with error handling</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">try</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;INVALID SQL&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">PDOException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">log_error</span><span class="p">(</span><span class="s2">&quot;Failed to run query&quot;</span><span class="p">,</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(),</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getCode</span><span class="p">(),</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;exception&#39;</span> <span class="o">=&gt;</span> <span class="nv">$e</span><span class="p">));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Escaping Data</h2>
+
+<h2>Prepared Statements</h2>
+
+<h2>Other Fetching Methods</h2>
+
+<h2>Transactions</h2>
+]]></content>
+  </entry>
   
 </feed>
