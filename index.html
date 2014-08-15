@@ -9,7 +9,8 @@
   <meta name="author" content="Jonathan Bernardi">
 
   
-  <meta name="description" content="The mysql extension has been marked as deprecated as of php 5.5.0 and will be removed completely in a future version. It is old and not very user &hellip;">
+  <meta name="description" content="I previously wrote about switching from the mysql extension to PDO.
+PDO introduces a number of convenient features beyond the mysql extension such as &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -64,6 +65,57 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2014/08/simplifying-database-interactions-with-doctrine-dbal/">Simplifying database interactions with Doctrine DBAL</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-15T00:00:00-07:00" pubdate data-updated="true">Aug 15<span>th</span>, 2014</time>
+        
+           | <a href="/2014/08/simplifying-database-interactions-with-doctrine-dbal/#disqus_thread"
+             data-disqus-identifier="http://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I previously wrote about <a href="/2014/08/moving-from-mysql-query-to-pdo">switching from the mysql extension to PDO</a>.
+PDO introduces a number of convenient features beyond the mysql extension such as transactions, prepared statements, and more fetching options.
+However there are still a few things that are a bit painful.</p>
+
+<p>This article will introduce <a href="http://www.doctrine-project.org/projects/dbal.html">Doctrine DBAL</a> to help alleviate some of these pain points.</p>
+
+<p><abbr title="Doctrine database abstraction &amp; access layer">Doctrine DBAL</abbr> is a wrapper around <a href="http://php.net/manual/en/book.pdo.php">PDO</a>.
+It adds a few conveniences beyond straight PDO as well as a query builder.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2014/08/simplifying-database-interactions-with-doctrine-dbal/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -150,6 +202,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2014/08/simplifying-database-interactions-with-doctrine-dbal/">Simplifying database interactions with Doctrine DBAL</a>
+      </li>
+    
+      <li class="post">
         <a href="/2014/08/moving-from-mysql-query-to-pdo/">Moving from mysql_query to PDO</a>
       </li>
     
@@ -168,10 +224,10 @@
 
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/category/mysql'>mysql (1)</a></li><li><a href='/category/pdo'>pdo (1)</a></li><li><a href='/category/php'>php (1)</a></li></ul>
+    <ul id="category-list"><li><a href='/category/doctrine'>doctrine (1)</a></li><li><a href='/category/mysql'>mysql (2)</a></li><li><a href='/category/pdo'>pdo (1)</a></li><li><a href='/category/php'>php (2)</a></li></ul>
 </section><section>
   <h1>Monthly Archives</h1>
-  <div class="monthly_archive"><ul class="year_list"><li class="year">2014 (1)</li><ul class="month_list"><li class="month"><a href='/2014/08/'>AUG (1)</a></li></ul></ul></div>
+  <div class="monthly_archive"><ul class="year_list"><li class="year">2014 (2)</li><ul class="month_list"><li class="month"><a href='/2014/08/'>AUG (2)</a></li></ul></ul></div>
 </section>
   
 </aside>

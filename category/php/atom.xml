@@ -4,7 +4,7 @@
   <title><![CDATA[Category: php | The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/category/php/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-08-07T22:44:09-07:00</updated>
+  <updated>2014-08-14T23:13:32-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,272 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Simplifying database interactions with Doctrine DBAL]]></title>
+    <link href="http://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal/"/>
+    <updated>2014-08-15T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal</id>
+    <content type="html"><![CDATA[<p>I previously wrote about <a href="/2014/08/moving-from-mysql-query-to-pdo">switching from the mysql extension to PDO</a>.
+PDO introduces a number of convenient features beyond the mysql extension such as transactions, prepared statements, and more fetching options.
+However there are still a few things that are a bit painful.</p>
+
+<p>This article will introduce <a href="http://www.doctrine-project.org/projects/dbal.html">Doctrine DBAL</a> to help alleviate some of these pain points.</p>
+
+<p><abbr title="Doctrine database abstraction &amp; access layer">Doctrine DBAL</abbr> is a wrapper around <a href="http://php.net/manual/en/book.pdo.php">PDO</a>.
+It adds a few conveniences beyond straight PDO as well as a query builder.</p>
+
+<!--more-->
+
+
+<p>There are a <a href="http://www.doctrine-project.org/projects.html">number of projects</a> under the Doctrine umbrella including a full <abbr title="Object Relational Mapper">ORM</abbr>.
+This article will only cover the DBAL project.</p>
+
+<h2>Installing Doctrine DBAL</h2>
+
+<p>The recommended way to install Doctrine DBAL is via <a href="https://getcomposer.org/">composer</a>.</p>
+
+<pre><code class="json Add to the composer.json require section">"doctrine/dbal": "2.3.4"
+</code></pre>
+
+<p>Alternatively you can download a zip archive from the <a href="http://www.doctrine-project.org/projects/dbal.html">project page</a>.</p>
+
+<p>If you aren&rsquo;t using composer or don&rsquo;t have a PSR-0 compatible autoloader you will need to add the class loader in the Doctrine/Common folder to load the Doctrine DBAL classes.</p>
+
+<pre><code class="php Setup Class Loader http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/introduction.html">use Doctrine\Common\ClassLoader;
+
+require '/path/to/doctrine/lib/Doctrine/Common/ClassLoader.php';
+
+$classLoader = new ClassLoader('Doctrine', '/path/to/doctrine');
+$classLoader-&gt;register();
+</code></pre>
+
+<h2>Connecting to The Database</h2>
+
+<p>Doctrine DBAL can connect to any type of database that PDO can connect to.
+For this article I am going to assume you are connecting to MySQL but the api is the same regardless of the database you are connecting to.</p>
+
+<pre><code class="php Connecting to the database http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#">$config = new \Doctrine\DBAL\Configuration();
+
+$connectionParams = array(
+    'dbname' =&gt; 'database',
+    'user' =&gt; 'user',
+    'password' =&gt; 'password',
+    'host' =&gt; 'localhost',
+    'port' =&gt; 3306,
+    'charset' =&gt; 'utf8',
+    'driver' =&gt; 'pdo_mysql',
+);
+$dbh = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+</code></pre>
+
+<p>One advantage that Doctrine DBAL has over plain PDO is that the Doctrine connection doesn&rsquo;t actually connect to the database until the first query is run.
+This means you can create the connection in the bootstrap of your application and if no queries are run for a particular request it wont need to actually connect to the database server.
+PDO connects to the database server as soon as you create a PDO instance.</p>
+
+<h2>Running Queries</h2>
+
+<p>Being a wrapper around PDO you can use the full PDO api including prepared statements and transactions just like you would with straight PDO.</p>
+
+<p>Fetching Data works exactly the same as with straight PDO.</p>
+
+<pre><code class="php Fetching Data http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#fetchall">// Fetch one row
+$sth = $dbh-&gt;query("SELECT * FROM users WHERE id = 1");
+$user = $sth-&gt;fetch();
+
+// Fetch all rows
+$sth = $dbh-&gt;query("SELECT * FROM users");
+$users = $sth-&gt;fetchAll();
+
+// Fetch column as scalar value
+$sth = $dbh-&gt;query("SELECT email FROM users WHERE id = 1");
+$email = $sth-&gt;fetchColumn();
+
+// Fetch column as array of scalar values
+$sth = $dbh-&gt;query("SELECT email FROM users");
+$emails = $sth-&gt;fetchAll(PDO::FETCH_COLUMN);
+
+// Fetch column as key value pairs
+$sth = $dbh-&gt;query("SELECT id, email FROM users");
+$users = $sth-&gt;fetchAll(PDO::FETCH_KEY_PAIR);
+</code></pre>
+
+<p>Prepared statements are also the same as straight PDO.</p>
+
+<pre><code class="php Prepared Statements http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#using-prepared-statements">$sth = $dbh-&gt;prepare("SELECT * FROM users WHERE id = ?");
+$sth-&gt;bindValue(1, $id, PDO::PARAM_INT);
+$sth-&gt;execute();
+$user = $sth-&gt;fetchAssoc();
+
+$sth = $dbh-&gt;prepare("UPDATE users SET name = :name, email = :email WHERE id = :id");
+$sth-&gt;bindeValue(":name", $name);
+$sth-&gt;bindeValue(":email", $email);
+$sth-&gt;bindeValue(":id", $id, PDO::PARAM_INT);
+$sth-&gt;execute();
+</code></pre>
+
+<p>With Doctrine DBAL you can combine preparing and executing into one step.</p>
+
+<pre><code class="php Preparing and Executing in one command">$sth = $conn-&gt;executeQuery('SELECT * FROM users WHERE email = ?', array('email@excample.com'));
+$user = $sth-&gt;fetch();
+
+// executeUpdate will return the number of affected rows
+$count = $dbh-&gt;executeUpdate("UPDATE users SET name = ?, email = ? WHERE id = ?", array($name, $email, $id));
+// Same with named parameters
+$count = $dbh-&gt;executeUpdate("UPDATE users SET name = :name, email = :email WHERE id = :id", array('name' =&gt; $name, 'email' =&gt; $email, 'id' =&gt; $id));
+
+// You can even prepare, execute, and fetch in one step
+$users = $dbh-&gt;fetchAll("SELECT * FROM users WHERE name LIKE ?", array($name . '%'));
+</code></pre>
+
+<h2>Inserts, Updates, and Deletes</h2>
+
+<p>With Doctrine DBAL you don&rsquo;t even need to write sql for inserts, updates, and deletes.</p>
+
+<pre><code class="php Inserts http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#insert">// Insert a new user into the users table
+$dbh-&gt;insert('users', array('name' =&gt; 'Bob', 'email' =&gt; 'bob@example.com'));
+// This is the same as running the following query
+// INSERT INTO users (name, email) VALUES ('Bob', 'bob@example.com')
+</code></pre>
+
+<pre><code class="php Updates http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#update">$dbh-&gt;update('users', array('name' =&gt; 'Bob'), array('id' =&gt; 1));
+// This is the same as running the following query
+// UPDATE users SET name = 'Bob' WHERE id = 1
+</code></pre>
+
+<pre><code class="php Deletes http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#delete">$dbh-&gt;delete('users', array('id' =&gt; 1));
+// This is the same as running the following query
+// DELETE FROM users WHERE id = 1
+</code></pre>
+
+<h2>Query Builder</h2>
+
+<p>Doctrine DBAL also features a <a href="http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/query-builder.html">query builderr</a> to help build complicated SQL queries.</p>
+
+<pre><code class="php Query Builder http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/query-builder.html">// This will run the following query
+/*
+SELECT u.id, u.name, u.email, p.bio
+FROM users u
+INNER JOIN user_profile p ON (u.id = p.user_id)
+WHERE u.id = 1
+ORDER BY u.name ASC
+*/
+$id = 1;
+$query = $dbh-&gt;createQueryBuilder();
+$query-&gt;select('u.id', 'u.name', 'u.email', 'p.bio')
+      -&gt;from('users', 'u')
+      -&gt;innerJoin('u', 'user_profile', 'p', 'u.id = p.user_id')
+      -&gt;orderBy('u.name', 'ASC')
+      -&gt;where('u.id = :id')
+      -&gt;setParameter(':id', $id)
+;
+$sth = $query-&gt;execute();
+$user = $sth-&gt;fetchAssoc();
+</code></pre>
+
+<p>Where I find the query builder to be the most helpful is when you have parts of the query that are dependent on user provided data.</p>
+
+<p>For example imagine a page with a search form with multiple fields that filter results by different columns.<br/>
+You might have a text field to search the names of users and another text field to search by email address.<br/>
+There is also a select box to search by account type with the values Any, Editors, and Members.<br/>
+If Any is selected you do not want to filter by account type but if Editors or Members is selected you do.<br/>
+With the other fields you only want to filter them if the user entered anything in the fields.
+You always only want to return active accounts.</p>
+
+<pre><code class="php">// User provided search data
+$search = array(
+  'name' =&gt; 'Bob',
+  'email' =&gt; null,
+  'type' =&gt; 'any'
+);
+
+// Query That should be run
+// SELECT * FROM users WHERE name LIKE '%Bob%'
+</code></pre>
+
+<pre><code class="php">// User provided search data
+$search = array(
+  'name' =&gt; 'Bob',
+  'email' =&gt; 'email@example.com',
+  'type' =&gt; 'member'
+);
+
+// Query That should be run
+// SELECT * FROM users WHERE active = 1 AND name LIKE '%Bob%' AND email LIKE '%email@example.com%' AND type = 'member' ORDER BY name ASC
+</code></pre>
+
+<p>With straight SQL the only way to build this query is with string concatenation.</p>
+
+<pre><code class="php Building query with string concatenation and PDO">$where = array("active = 1");
+if ($search['name']) {
+    $where[] = "name LIKE :name";
+}
+if ($search['email']) {
+    $where[] = "email LIKE :email";
+}
+if ($search['type'] != 'any') {
+    $where[] = "type = :type";
+}
+if ($where) {
+    $where = implode(" AND ", $where);
+} else {
+    $where = '';
+}
+
+$sql = "SELECT * FROM users WHERE " . $where . " ORDER BY name ASC";
+$sth = $dbh-&gt;prepare($sql);
+if ($search['name']) {
+    $sth-&gt;bindValue(':name', "%" . $search['name'] . "%");
+}
+if ($search['email']) {
+    $sth-&gt;bindValue(':email', "%" . $search['email'] . "%");
+}
+if ($search['type'] != 'any') {
+    $sth-&gt;bindValue(':type', $search['type']);
+}
+$sth-&gt;execute();
+$users = $sth-&gt;fetchAll(PDO::FETCH_ASSOC);
+</code></pre>
+
+<p>This example is actually pretty simple and the code is already difficult to understand.</p>
+
+<p>Lets look at the same example using the query builder</p>
+
+<pre><code class="php Using the query builder">$query = $dbh-&gt;createQueryBuilder();
+$query-&gt;select('*');
+$query-&gt;from('users');
+$query-&gt;where("active = 1");
+if ($search['name']) {
+    $query-&gt;andWhere('name LIKE :name');
+    $query-&gt;setParameter(':name', "%" . $search['name'] . "%");
+}
+if ($search['email']) {
+    $query-&gt;andWhere('email LIKE :email');
+    $query-&gt;setParameter(':email', "%" . $search['email'] . "%");
+}
+if ($search['type'] != 'any') {
+    $query-&gt;andWhere('type = :type');
+    $query-&gt;setParameter(':type', $search['type']);
+}
+$query-&gt;orderBy('name', 'ASC');
+$sth = $query-&gt;execute();
+$users = $sth-&gt;fetchAll(PDO::FETCH_ASSOC);
+</code></pre>
+
+<p>Not only is that code shorter but if you read it out loud it even sounds more like English.<br/>
+This greatly helps at understanding what the code does at a glance 6 months later.</p>
+
+<p>The query builder does result in some extra overhead as it needs to compile the query so raw SQL is generally a better idea if the query is simple.</p>
+
+<h2>Conclusion</h2>
+
+<p>Doctrine DBAL adds a lot of functionality for a very lightweight overhead.
+Even if you don&rsquo;t use the query builder it is worth it for the shorter syntax on inserts, updates, and deletes as well as the ability to prepare, execute, and fetch data in one statement.</p>
+
+<p>There is a lot more functionality I didn&rsquo;t cover so I recommend taking a look at <a href="http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html">the documentationn</a>
+for other pieces of functionality such as events, a schema manager, caching, sharding, and more.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Moving from mysql_query to PDO]]></title>

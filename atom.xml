@@ -4,7 +4,7 @@
   <title><![CDATA[The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-08-07T22:44:09-07:00</updated>
+  <updated>2014-08-14T23:13:32-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,445 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Simplifying database interactions with Doctrine DBAL]]></title>
+    <link href="http://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal/"/>
+    <updated>2014-08-15T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal</id>
+    <content type="html"><![CDATA[<p>I previously wrote about <a href="http://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo">switching from the mysql extension to PDO</a>.
+PDO introduces a number of convenient features beyond the mysql extension such as transactions, prepared statements, and more fetching options.
+However there are still a few things that are a bit painful.</p>
+
+<p>This article will introduce <a href="http://www.doctrine-project.org/projects/dbal.html">Doctrine DBAL</a> to help alleviate some of these pain points.</p>
+
+<p><abbr title="Doctrine database abstraction &amp; access layer">Doctrine DBAL</abbr> is a wrapper around <a href="http://php.net/manual/en/book.pdo.php">PDO</a>.
+It adds a few conveniences beyond straight PDO as well as a query builder.</p>
+
+<!--more-->
+
+
+<p>There are a <a href="http://www.doctrine-project.org/projects.html">number of projects</a> under the Doctrine umbrella including a full <abbr title="Object Relational Mapper">ORM</abbr>.
+This article will only cover the DBAL project.</p>
+
+<h2>Installing Doctrine DBAL</h2>
+
+<p>The recommended way to install Doctrine DBAL is via <a href="https://getcomposer.org/">composer</a>.</p>
+
+<figure class='code'><figcaption><span>Add to the composer.json require section</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="s2">&quot;doctrine/dbal&quot;</span><span class="err">:</span> <span class="s2">&quot;2.3.4&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Alternatively you can download a zip archive from the <a href="http://www.doctrine-project.org/projects/dbal.html">project page</a>.</p>
+
+<p>If you aren&rsquo;t using composer or don&rsquo;t have a PSR-0 compatible autoloader you will need to add the class loader in the Doctrine/Common folder to load the Doctrine DBAL classes.</p>
+
+<figure class='code'><figcaption><span>Setup Class Loader</span><a href='http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/introduction.html'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">use</span> <span class="nx">Doctrine\Common\ClassLoader</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">require</span> <span class="s1">&#39;/path/to/doctrine/lib/Doctrine/Common/ClassLoader.php&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$classLoader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClassLoader</span><span class="p">(</span><span class="s1">&#39;Doctrine&#39;</span><span class="p">,</span> <span class="s1">&#39;/path/to/doctrine&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$classLoader</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Connecting to The Database</h2>
+
+<p>Doctrine DBAL can connect to any type of database that PDO can connect to.
+For this article I am going to assume you are connecting to MySQL but the api is the same regardless of the database you are connecting to.</p>
+
+<figure class='code'><figcaption><span>Connecting to the database</span><a href='http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html#'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Doctrine\DBAL\Configuration</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$connectionParams</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="s1">&#39;dbname&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;database&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;user&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;host&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;port&#39;</span> <span class="o">=&gt;</span> <span class="mi">3306</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;charset&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;utf8&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;driver&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;pdo_mysql&#39;</span><span class="p">,</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'><span class="nv">$dbh</span> <span class="o">=</span> <span class="nx">\Doctrine\DBAL\DriverManager</span><span class="o">::</span><span class="na">getConnection</span><span class="p">(</span><span class="nv">$connectionParams</span><span class="p">,</span> <span class="nv">$config</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One advantage that Doctrine DBAL has over plain PDO is that the Doctrine connection doesn&rsquo;t actually connect to the database until the first query is run.
+This means you can create the connection in the bootstrap of your application and if no queries are run for a particular request it wont need to actually connect to the database server.
+PDO connects to the database server as soon as you create a PDO instance.</p>
+
+<h2>Running Queries</h2>
+
+<p>Being a wrapper around PDO you can use the full PDO api including prepared statements and transactions just like you would with straight PDO.</p>
+
+<p>Fetching Data works exactly the same as with straight PDO.</p>
+
+<figure class='code'><figcaption><span>Fetching Data</span><a href='http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#fetchall'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// Fetch one row</span>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM users WHERE id = 1&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetch</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Fetch all rows</span>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM users&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Fetch column as scalar value</span>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;SELECT email FROM users WHERE id = 1&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$email</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchColumn</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Fetch column as array of scalar values</span>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;SELECT email FROM users&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$emails</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">FETCH_COLUMN</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Fetch column as key value pairs</span>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s2">&quot;SELECT id, email FROM users&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">FETCH_KEY_PAIR</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Prepared statements are also the same as straight PDO.</p>
+
+<figure class='code'><figcaption><span>Prepared Statements</span><a href='http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#using-prepared-statements'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM users WHERE id = ?&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">bindValue</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span> <span class="nx">PDO</span><span class="o">::</span><span class="na">PARAM_INT</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchAssoc</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">(</span><span class="s2">&quot;UPDATE users SET name = :name, email = :email WHERE id = :id&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">bindeValue</span><span class="p">(</span><span class="s2">&quot;:name&quot;</span><span class="p">,</span> <span class="nv">$name</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">bindeValue</span><span class="p">(</span><span class="s2">&quot;:email&quot;</span><span class="p">,</span> <span class="nv">$email</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">bindeValue</span><span class="p">(</span><span class="s2">&quot;:id&quot;</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span> <span class="nx">PDO</span><span class="o">::</span><span class="na">PARAM_INT</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With Doctrine DBAL you can combine preparing and executing into one step.</p>
+
+<figure class='code'><figcaption><span>Preparing and Executing in one command</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="na">executeQuery</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM users WHERE email = ?&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;email@excample.com&#39;</span><span class="p">));</span>
+</span><span class='line'><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetch</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// executeUpdate will return the number of affected rows</span>
+</span><span class='line'><span class="nv">$count</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s2">&quot;UPDATE users SET name = ?, email = ? WHERE id = ?&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$email</span><span class="p">,</span> <span class="nv">$id</span><span class="p">));</span>
+</span><span class='line'><span class="c1">// Same with named parameters</span>
+</span><span class='line'><span class="nv">$count</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">executeUpdate</span><span class="p">(</span><span class="s2">&quot;UPDATE users SET name = :name, email = :email WHERE id = :id&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$name</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="nv">$email</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// You can even prepare, execute, and fetch in one step</span>
+</span><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM users WHERE name LIKE ?&quot;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$name</span> <span class="o">.</span> <span class="s1">&#39;%&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Inserts, Updates, and Deletes</h2>
+
+<p>With Doctrine DBAL you don&rsquo;t even need to write sql for inserts, updates, and deletes.</p>
+
+<figure class='code'><figcaption><span>Inserts</span><a href='http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#insert'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// Insert a new user into the users table</span>
+</span><span class='line'><span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">insert</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bob@example.com&#39;</span><span class="p">));</span>
+</span><span class='line'><span class="c1">// This is the same as running the following query</span>
+</span><span class='line'><span class="c1">// INSERT INTO users (name, email) VALUES (&#39;Bob&#39;, &#39;bob@example.com&#39;)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Updates</span><a href='http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#update'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bob&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">));</span>
+</span><span class='line'><span class="c1">// This is the same as running the following query</span>
+</span><span class='line'><span class="c1">// UPDATE users SET name = &#39;Bob&#39; WHERE id = 1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Deletes</span><a href='http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/data-retrieval-and-manipulation.html#delete'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">));</span>
+</span><span class='line'><span class="c1">// This is the same as running the following query</span>
+</span><span class='line'><span class="c1">// DELETE FROM users WHERE id = 1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Query Builder</h2>
+
+<p>Doctrine DBAL also features a <a href="http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/query-builder.html">query builderr</a> to help build complicated SQL queries.</p>
+
+<figure class='code'><figcaption><span>Query Builder</span><a href='http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/query-builder.html'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// This will run the following query</span>
+</span><span class='line'><span class="cm">/*</span>
+</span><span class='line'><span class="cm">SELECT u.id, u.name, u.email, p.bio</span>
+</span><span class='line'><span class="cm">FROM users u</span>
+</span><span class='line'><span class="cm">INNER JOIN user_profile p ON (u.id = p.user_id)</span>
+</span><span class='line'><span class="cm">WHERE u.id = 1</span>
+</span><span class='line'><span class="cm">ORDER BY u.name ASC</span>
+</span><span class='line'><span class="cm">*/</span>
+</span><span class='line'><span class="nv">$id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">createQueryBuilder</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$query</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">(</span><span class="s1">&#39;u.id&#39;</span><span class="p">,</span> <span class="s1">&#39;u.name&#39;</span><span class="p">,</span> <span class="s1">&#39;u.email&#39;</span><span class="p">,</span> <span class="s1">&#39;p.bio&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="o">-&gt;</span><span class="na">innerJoin</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;user_profile&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;u.id = p.user_id&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="o">-&gt;</span><span class="na">orderBy</span><span class="p">(</span><span class="s1">&#39;u.name&#39;</span><span class="p">,</span> <span class="s1">&#39;ASC&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;u.id = :id&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">&#39;:id&#39;</span><span class="p">,</span> <span class="nv">$id</span><span class="p">)</span>
+</span><span class='line'><span class="p">;</span>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchAssoc</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Where I find the query builder to be the most helpful is when you have parts of the query that are dependent on user provided data.</p>
+
+<p>For example imagine a page with a search form with multiple fields that filter results by different columns.<br/>
+You might have a text field to search the names of users and another text field to search by email address.<br/>
+There is also a select box to search by account type with the values Any, Editors, and Members.<br/>
+If Any is selected you do not want to filter by account type but if Editors or Members is selected you do.<br/>
+With the other fields you only want to filter them if the user entered anything in the fields.
+You always only want to return active accounts.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// User provided search data</span>
+</span><span class='line'><span class="nv">$search</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>  <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="k">null</span><span class="p">,</span>
+</span><span class='line'>  <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;any&#39;</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Query That should be run</span>
+</span><span class='line'><span class="c1">// SELECT * FROM users WHERE name LIKE &#39;%Bob%&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// User provided search data</span>
+</span><span class='line'><span class="nv">$search</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>  <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bob&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;email@example.com&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;member&#39;</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Query That should be run</span>
+</span><span class='line'><span class="c1">// SELECT * FROM users WHERE active = 1 AND name LIKE &#39;%Bob%&#39; AND email LIKE &#39;%email@example.com%&#39; AND type = &#39;member&#39; ORDER BY name ASC</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With straight SQL the only way to build this query is with string concatenation.</p>
+
+<figure class='code'><figcaption><span>Building query with string concatenation and PDO</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$where</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;active = 1&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$where</span><span class="p">[]</span> <span class="o">=</span> <span class="s2">&quot;name LIKE :name&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$where</span><span class="p">[]</span> <span class="o">=</span> <span class="s2">&quot;email LIKE :email&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$where</span><span class="p">[]</span> <span class="o">=</span> <span class="s2">&quot;type = :type&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$where</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$where</span> <span class="o">=</span> <span class="nb">implode</span><span class="p">(</span><span class="s2">&quot; AND &quot;</span><span class="p">,</span> <span class="nv">$where</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$where</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$sql</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM users WHERE &quot;</span> <span class="o">.</span> <span class="nv">$where</span> <span class="o">.</span> <span class="s2">&quot; ORDER BY name ASC&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">bindValue</span><span class="p">(</span><span class="s1">&#39;:name&#39;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span> <span class="o">.</span> <span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;%&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">bindValue</span><span class="p">(</span><span class="s1">&#39;:email&#39;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span> <span class="o">.</span> <span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;%&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">bindValue</span><span class="p">(</span><span class="s1">&#39;:type&#39;</span><span class="p">,</span> <span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">FETCH_ASSOC</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This example is actually pretty simple and the code is already difficult to understand.</p>
+
+<p>Lets look at the same example using the query builder</p>
+
+<figure class='code'><figcaption><span>Using the query builder</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$dbh</span><span class="o">-&gt;</span><span class="na">createQueryBuilder</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$query</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$query</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$query</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s2">&quot;active = 1&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">andWhere</span><span class="p">(</span><span class="s1">&#39;name LIKE :name&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">&#39;:name&#39;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span> <span class="o">.</span> <span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;%&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">andWhere</span><span class="p">(</span><span class="s1">&#39;email LIKE :email&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">&#39;:email&#39;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span> <span class="o">.</span> <span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;%&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">andWhere</span><span class="p">(</span><span class="s1">&#39;type = :type&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setParameter</span><span class="p">(</span><span class="s1">&#39;:type&#39;</span><span class="p">,</span> <span class="nv">$search</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nv">$query</span><span class="o">-&gt;</span><span class="na">orderBy</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;ASC&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nv">$sth</span> <span class="o">=</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$users</span> <span class="o">=</span> <span class="nv">$sth</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="nx">PDO</span><span class="o">::</span><span class="na">FETCH_ASSOC</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Not only is that code shorter but if you read it out loud it even sounds more like English.<br/>
+This greatly helps at understanding what the code does at a glance 6 months later.</p>
+
+<p>The query builder does result in some extra overhead as it needs to compile the query so raw SQL is generally a better idea if the query is simple.</p>
+
+<h2>Conclusion</h2>
+
+<p>Doctrine DBAL adds a lot of functionality for a very lightweight overhead.
+Even if you don&rsquo;t use the query builder it is worth it for the shorter syntax on inserts, updates, and deletes as well as the ability to prepare, execute, and fetch data in one statement.</p>
+
+<p>There is a lot more functionality I didn&rsquo;t cover so I recommend taking a look at <a href="http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html">the documentationn</a>
+for other pieces of functionality such as events, a schema manager, caching, sharding, and more.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Moving from mysql_query to PDO]]></title>
