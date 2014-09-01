@@ -575,6 +575,12 @@ Once a spam-bot finds this script you could find your inbox full of worthless ju
   </footer>
 </article>
 
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
 </div>
 
 <aside class="sidebar">
@@ -661,7 +667,15 @@ Once a spam-bot finds this script you could find your inbox full of worthless ju
       var disqus_shortname = 'thedevfiles';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/';
+        var disqus_url = 'http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/';
+        var disqus_script = 'embed.js';
+        function disqus_config() {
+            this.callbacks.onNewComment = [function(comment) {
+              ga('send', 'event', 'comment', 'post', 'Post a Comment');
+            }];
+        }
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

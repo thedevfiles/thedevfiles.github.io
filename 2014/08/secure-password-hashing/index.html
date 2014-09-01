@@ -400,6 +400,12 @@ Make sure to use prepared statements to prevent SQL injection.</p>
   </footer>
 </article>
 
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
 </div>
 
 <aside class="sidebar">
@@ -486,7 +492,15 @@ Make sure to use prepared statements to prevent SQL injection.</p>
       var disqus_shortname = 'thedevfiles';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://www.thedevfiles.com/2014/08/secure-password-hashing/';
+        var disqus_url = 'http://www.thedevfiles.com/2014/08/secure-password-hashing/';
+        var disqus_script = 'embed.js';
+        function disqus_config() {
+            this.callbacks.onNewComment = [function(comment) {
+              ga('send', 'event', 'comment', 'post', 'Post a Comment');
+            }];
+        }
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
