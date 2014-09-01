@@ -4,7 +4,7 @@
   <title><![CDATA[Category: php | The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/category/php/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-08-28T21:35:06-07:00</updated>
+  <updated>2014-09-01T11:35:55-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,265 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a simple contact form in PHP - Part 1]]></title>
+    <link href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/"/>
+    <updated>2014-09-01T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1</id>
+    <content type="html"><![CDATA[<p>In this series we will be building a simple contact form in php.</p>
+
+<p>It will cover sending emails and form validation.</p>
+
+<!--more-->
+
+
+<h2>Creating the Contact Form</h2>
+
+<p>We will start with the form itself.</p>
+
+<pre><code class="html contact.php">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form action="contact.php" method="post" accept-charset="utf-8"&gt;
+     &lt;fieldset&gt;
+         &lt;legend&gt;Contact Us&lt;/legend&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="name"&gt;Name: &lt;/label&gt;
+             &lt;input id="name" type="text" name="name" value=""&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+             &lt;input id="email" type="text" name="email" value=""&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="message"&gt;Message:&lt;/label&gt;
+             &lt;textarea id="message" name="message"&gt;&lt;/textarea&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;input type="submit" value="Submit"&gt;
+         &lt;/div&gt;
+     &lt;/fieldset&gt;
+ &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>We will also add a stylesheet with some basic styles for the form.</p>
+
+<pre><code class="css styles.css">fieldset {
+    margin:0 auto;
+    width: 235px;
+}
+legend {
+    font-weight:bold;
+    font-size:125%;
+}
+form div.row {
+    margin-bottom: 8px;
+}
+label {
+    display: block;
+    font-weight:bold;
+}
+input[type=text],input[type=email] {
+    display:block;
+    width: 400px;
+}
+
+textarea {
+    width: 400px;
+    height:200px;
+}
+</code></pre>
+
+<p>If you view the page in a browser it should look something like this.</p>
+
+<p><img src="/images/contact-form/part-1/contact-form.png" alt="Contact Form" /></p>
+
+<p>Not the prettiest form but this isn&rsquo;t a design tutorial.
+Feel free to add your own styles.</p>
+
+<p>We also will need a page to send the user to after they submit the form.
+This should have some sort of &ldquo;Thank you for submitting&rdquo; message on it.</p>
+
+<pre><code class="html thankyou.html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;Thank you for your message.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h2>Sending an email on form post.</h2>
+
+<p>We have a form but it doesn&rsquo;t do anything when the user submits it.</p>
+
+<p>Add the following to the top of the contact.php page above the <code>&lt;!DOCTYPE html&gt;</code> line.</p>
+
+<pre><code class="php contact.php">&lt;?php
+
+// Check if the form has been posted
+if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+    // The email address the email will be sent to
+    $to = "business@example.com";
+    // The email subject
+    $subject = "Contact Form Submission";
+    // Set the from and reply-to address for the email
+    $headers = "From: website@example.com\r\n"
+             . "X-Mailer: PHP/" . phpversion();
+    // Build the body of the email
+    $mailbody = "The contact form has been filled out.\n\n"
+              . "Name: " . $_POST['name'] . "\n"
+              . "Email: " . $_POST['email'] . "\n"
+              . "Message:\n" . $_POST['message'];
+    // Send the email
+    mail($to, $subject, $mailbody);
+    // Go to the thank you page
+    header("location: thankyou.html");
+    exit;
+
+}
+
+?&gt;
+</code></pre>
+
+<p>The entire page should not look like this.</p>
+
+<pre><code class="php contact.php">&lt;?php
+
+// Check if the form has been posted
+if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+    // The email address the email will be sent to
+    $to = "business@example.com";
+    // The email subject
+    $subject = "Contact Form Submission";
+    // Set the from and reply-to address for the email
+    $headers = "From: website@example.com\r\n"
+             . "X-Mailer: PHP/" . phpversion();
+    // Build the body of the email
+    $mailbody = "The contact form has been filled out.\n\n"
+              . "Name: " . $_POST['name'] . "\n"
+              . "Email: " . $_POST['email'] . "\n"
+              . "Message:\n" . $_POST['message'];
+    // Send the email
+    mail($to, $subject, $mailbody);
+    // Go to the thank you page
+    header("location: thankyou.html");
+    exit;
+
+}
+
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form action="contact.php" method="post" accept-charset="utf-8"&gt;
+     &lt;fieldset&gt;
+         &lt;legend&gt;Contact Us&lt;/legend&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="name"&gt;Name: &lt;/label&gt;
+             &lt;input id="name" type="text" name="name" value=""&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+             &lt;input id="email" type="text" name="email" value=""&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="message"&gt;Message:&lt;/label&gt;
+             &lt;textarea id="message" name="message"&gt;&lt;/textarea&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;input type="submit" value="Submit"&gt;
+         &lt;/div&gt;
+     &lt;/fieldset&gt;
+ &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3>How does it work?</h3>
+
+<p>First we are checking if each of the form fields have been posted.
+If they exist the user has submitted the form.</p>
+
+<pre><code class="php">if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+</code></pre>
+
+<p>Next we define where we would like the email to be sent and what the subject of the email should be.<br/>
+Change the <code>$to</code> variable to your own email address.</p>
+
+<pre><code class="php">// The email address the email will be sent to
+$to = "business@example.com";
+// The email subject
+$subject = "Contact Form Submission";
+</code></pre>
+
+<p>The headers set the email address used for the from in the email.
+The other line indicates the application used to send the email.  In this case php.</p>
+
+<pre><code class="php">// Set the from and reply-to address for the email
+$headers = "From: website@example.com\r\n"
+         . "X-Mailer: PHP/" . phpversion();
+</code></pre>
+
+<p>We now need to build the body of the email itself.
+It should include each of the posted values.</p>
+
+<pre><code class="php">// Build the body of the email
+$mailbody = "The contact form has been filled out.\n\n"
+          . "Name: " . $_POST['name'] . "\n"
+          . "Email: " . $_POST['email'] . "\n"
+          . "Message:\n" . $_POST['message'];
+</code></pre>
+
+<p>Next we use the <a href="http://us3.php.net/manual/en/book.mail.php">php mail</a> function to actually send the email.</p>
+
+<pre><code class="php">// Send the email
+mail($to, $subject, $mailbody);
+</code></pre>
+
+<p>Finally we send the user to the thankyou.html page that we created.</p>
+
+<pre><code class="php">// Go to the thank you page
+header("location: thankyou.html");
+exit;
+</code></pre>
+
+<h2>Improving the script</h2>
+
+<p>While this script would work as is for your contact form it have a number of problems with it.</p>
+
+<p>The biggest one is that there is no form validation.<br/>
+A user can submit a blank form and it will send the email and redirect to the thankyou.html page anyway.</p>
+
+<p>The data the user is submitting is not being escaped or filtered.<br/>
+We only want plain text being submitted through the form but without any enforcement of that the user can submit anything including scripts that might cause security issues with certain email clients.</p>
+
+<p>There is nothing to help prevent spam.<br/>
+Once a spam-bot finds this script you could find your inbox full of worthless junk.</p>
+
+<p>In the next part I will tackle some of these issues.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Secure Password Hashing with PHP]]></title>
