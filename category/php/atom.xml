@@ -4,7 +4,7 @@
   <title><![CDATA[Category: php | The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/category/php/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-09-02T08:19:43-07:00</updated>
+  <updated>2014-09-03T08:23:43-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,353 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a simple contact form in PHP - Part 3]]></title>
+    <link href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/"/>
+    <updated>2014-09-03T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3</id>
+    <content type="html"><![CDATA[<p>As we last left it in <a href="/2014/09/building-a-simple-contact-form-in-php-part-2">part 2</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1">Building a simple contact form in PHP</a> we added server-side form validation to our contact form and input filtering to the submitted data before sending out the email.</p>
+
+<p>In this part we are going to add some client-side validation to our contact form.</p>
+
+<!--more-->
+
+
+<p>This is the contact form as we left it.</p>
+
+<pre><code class="php contact.php"> &lt;?php
+
+$valid = true;
+$errors = array();
+
+$contact = array(
+    'name' =&gt; null,
+    'email' =&gt; null,
+    'message' =&gt; null
+);
+
+// Check if the form has been posted
+if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+    $contact = filter_input_array(INPUT_POST, array(
+        'name'   =&gt; FILTER_SANITIZE_STRING,
+        'email'   =&gt; FILTER_SANITIZE_STRING,
+        'message'   =&gt; FILTER_SANITIZE_STRING,
+    ), true);
+    if (empty($contact['name'])) {
+        $valid = false;
+        $errors['name'] = "You must enter your name.";
+    }
+    if (empty($contact['email'])) {
+        $valid = false;
+        $errors['email'] = "You must enter your email address.";
+    } elseif (!filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)) {
+        $valid = false;
+        $errors['email'] = "You must enter a valid email address.";
+    }
+    if (empty($contact['message'])) {
+        $valid = false;
+        $errors['message'] = "You must enter a message.";
+    }
+    if ($valid) {
+        // The email address the email will be sent to
+        $to = "business@example.com";
+        // The email subject
+        $subject = "Contact Form Submission";
+        // Set the from and reply-to address for the email
+        $headers = "From: website@example.com\r\n"
+                 . "Reply-To: " . $contact['email'] . "\r\n"
+                 . "X-Mailer: PHP/" . phpversion();
+        // Build the body of the email
+        $mailbody = "The contact form has been filled out.\n\n"
+                  . "Name: " . $contact['name'] . "\n"
+                  . "Email: " . $contact['email'] . "\n"
+                  . "Message:\n" . $contact['message'];
+        // Send the email
+        mail($to, $subject, $mailbody);
+        // Go to the thank you page
+        header("location: thankyou.html");
+        exit;
+    }
+}
+
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form action="contact.php" method="post" accept-charset="utf-8"&gt;
+        &lt;fieldset&gt;
+            &lt;legend&gt;Contact Us&lt;/legend&gt;
+            &lt;?php if (!$valid): ?&gt;
+                &lt;div class="error"&gt;
+                    &lt;?php foreach($errors as $message):?&gt;
+                        &lt;div&gt;&lt;?php echo htmlspecialchars($message); ?&gt;&lt;/div&gt;
+                    &lt;?php endforeach; ?&gt;
+                &lt;/div&gt;
+            &lt;?php endif; ?&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="name"&gt;Name: &lt;/label&gt;
+                &lt;input id="name" type="text" name="name" value="&lt;?php echo htmlspecialchars($contact['name']);?&gt;"&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+                &lt;input id="email" type="text" name="email" value="&lt;?php echo htmlspecialchars($contact['email']);?&gt;"&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="message"&gt;Message:&lt;/label&gt;
+                &lt;textarea id="message" name="message"&gt;&lt;?php echo htmlspecialchars($contact['message']);?&gt;&lt;/textarea&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;input type="submit" value="Submit"&gt;
+            &lt;/div&gt;
+        &lt;/fieldset&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h2>Why Add Client-Side Validation?</h2>
+
+<p>It is important to keep in mind that client-side validation doesn&rsquo;t not provide any extra security for your application.  Circumventing it is as easy as turning off javascript in your browser.
+Implementing client-side validation without server-side validation is like not having any validation at all.
+So why even have client-side validation?  Server-Side validation will catch all of the same problems so what is the benefit?</p>
+
+<p>The reason to use client-side validation is simply to make things a bit easier on the user.
+To validate something om the server the form must be submitted and a new request is created.
+If the validation fails the browser must download and render the page again including all assets like css, and images.  Any javascript files will be run again.
+If a required form field is blank why even bother to send the request to the server in the first place just to tell you what you already know?</p>
+
+<p>For a form as small as this contact form this isn&rsquo;t really a big deal but the more fields there are and the more complicated the form is the more valuable client-side form validation becomes.</p>
+
+<h2>Adding HTML5 Client-Side Validation</h2>
+
+<p>Most browsers actually have built in client-side validation just by adding attributes to your form elements.</p>
+
+<p>Add a <code>required</code> attribute to each of the form elements.</p>
+
+<pre><code class="php">// name
+&lt;input id="name" type="text" name="name" value="&lt;?php echo htmlspecialchars($contact['name']);?&gt;" required&gt;
+// email
+&lt;input id="email" type="text" name="email" value="&lt;?php echo htmlspecialchars($contact['email']);?&gt;" required&gt;
+// message
+&lt;textarea id="message" name="message"&gt;&lt;?php echo htmlspecialchars($contact['message']);?&gt;&lt;/textarea&gt;
+</code></pre>
+
+<p>Now load up the form any try submitting a blank form.
+Depending on your browser you should see a message telling you to fill out a required field and the form isn&rsquo;t submitted.</p>
+
+<p>Here is what it looks like in Google Chrome.</p>
+
+<p><img src="/images/contact-form/part-3/html5-validation.png" alt="HTML5 Validation" /></p>
+
+<p>Now change the email input type from <code>text</code> to <code>email</code> so it looks like the following.</p>
+
+<pre><code class="php">&lt;input id="email" type="email" name="email" value="&lt;?php echo htmlspecialchars($contact['email']);?&gt;" required&gt;
+</code></pre>
+
+<p>Now fill out the other two fields en enter something that isn&rsquo;t an email address in the email field.</p>
+
+<p>Here is what I see in Google Chrome.</p>
+
+<p><img src="/images/contact-form/part-3/html5-email-validation.png" alt="HTML5 Validation" /></p>
+
+<p>This also has the benefit of showing an email-specific keyboard on many mobile devices when the email field is filled out.</p>
+
+<h2>Javascript Form Validation using Parsley</h2>
+
+<p>While the built-in html5 validation does get the job done it tends to be ugly and you don&rsquo;t have much control over it.</p>
+
+<p>We are going to use a form validation library called <a href="http://parsleyjs.org">Parsley</a> to help us add form validation that will use the same attributes as the html5 form validation we already added.</p>
+
+<p>Add the following to the html below the form but before the closing <code>&lt;/body&gt;</code> tag.</p>
+
+<p>```html</p>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.2/parsley.min.js"></script>
+
+
+<pre><code>
+Parsley depends on [jQuery](http://jquery.com) so I am loading that as well as the Parsley library itself.
+I am loading both using a [CDN](http://en.wikipedia.org/wiki/Content_delivery_network) but you could just as easily download both libraries from their websites and include them locally.
+
+Now that the library is included the first thing we need to do is disable the html5 form validation.  
+Add a `novalidate` attribute to the `form` tag.  This will disable the built-in html5 form validation so we can have Parsley do the work.
+
+Next we need to tell Parsley that we want it to validate our form.  
+Add a `data-parsley-validate` attribute to the `form` tag.
+
+The form tag should now look like the following.
+</code></pre>
+
+<p><form action="contact.php" method="post" accept-charset="utf-8" data-parsley-validate novalidate>
+```</p>
+
+<p>Now load up the page and try submitting a blank form.</p>
+
+<p>You should see <code>This value is required.</code> under each of the form fields.</p>
+
+<p>Lets make it look a bit better.  Add the following to your <code>styles.css</code> file.</p>
+
+<pre><code class="css">ul.parsley-errors-list{
+    margin:0;
+    padding:0;
+}
+ul.parsley-errors-list li{
+    margin:0 0 0 5px;
+    padding:0;
+    list-style-type: none;
+    color: #CC0000;
+    font-weight:bold;
+}
+</code></pre>
+
+<p><img src="/images/contact-form/part-3/parsely-validation.png" alt="HTML5 Validation" /></p>
+
+<h3>Customizing error messages</h3>
+
+<p>Now we are going to customize the error messages displayed for failed form validation.</p>
+
+<p>Add a <code>data-parsley-required-message</code> attribute to each of the form fields equal to the message you want displayed when that validation fails.
+It should look like the following.</p>
+
+<p>```php</p>
+
+<div class="row">
+    <label for="name">Name: </label>
+    <input id="name" type="text" name="name" value="<?php echo htmlspecialchars($contact['name']);?>" required data-parsley-required-message="You must enter your name.">
+</div>
+
+
+<div class="row">
+    <label for="email">Email Address: </label>
+    <input id="email" type="email" name="email" value="<?php echo htmlspecialchars($contact['email']);?>" required data-parsley-required-message="You must enter your email address." parsley-type-email-message="You must enter a valid email address.">
+</div>
+
+
+<div class="row">
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" required data-parsley-required-message="You must enter a message."><?php echo htmlspecialchars($contact['message']);?></textarea>
+</div>
+
+
+<pre><code>Now the custom messages you provided will be displayed instead of the default `This value is required.` message.
+
+![HTML5 Validation](/images/contact-form/part-3/parsely-messages.png)
+
+ The full `contact.php` should now look like the following.
+</code></pre>
+
+<p>&lt;?php</p>
+
+<p>$valid = true;
+$errors = array();</p>
+
+<p>$contact = array(
+    &lsquo;name&rsquo; => null,
+    &lsquo;email&rsquo; => null,
+    &lsquo;message&rsquo; => null
+);</p>
+
+<p>// Check if the form has been posted
+if (isset($<em>POST[&lsquo;name&rsquo;], $</em>POST[&lsquo;email&rsquo;], $_POST[&lsquo;message&rsquo;])) {
+    $contact = filter_input_array(INPUT_POST, array(
+        &lsquo;name&rsquo;   => FILTER_SANITIZE_STRING,
+        &lsquo;email&rsquo;   => FILTER_SANITIZE_STRING,
+        &lsquo;message&rsquo;   => FILTER_SANITIZE_STRING,
+    ), true);
+    if (empty($contact[&lsquo;name&rsquo;])) {
+        $valid = false;
+        $errors[&lsquo;name&rsquo;] = &ldquo;You must enter your name.&rdquo;;
+    }
+    if (empty($contact[&lsquo;email&rsquo;])) {
+        $valid = false;
+        $errors[&lsquo;email&rsquo;] = &ldquo;You must enter your email address.&rdquo;;
+    } elseif (!filter_input(INPUT_POST, &lsquo;email&rsquo;, FILTER_VALIDATE_EMAIL)) {
+        $valid = false;
+        $errors[&lsquo;email&rsquo;] = &ldquo;You must enter a valid email address.&rdquo;;
+    }
+    if (empty($contact[&lsquo;message&rsquo;])) {
+        $valid = false;
+        $errors[&lsquo;message&rsquo;] = &ldquo;You must enter a message.&rdquo;;
+    }
+    if ($valid) {
+        // The email address the email will be sent to
+        $to = &ldquo;<a href="&#x6d;&#x61;&#x69;&#108;&#x74;&#x6f;&#58;&#98;&#x75;&#x73;&#x69;&#110;&#x65;&#x73;&#115;&#64;&#x65;&#120;&#97;&#109;&#x70;&#108;&#x65;&#x2e;&#99;&#x6f;&#x6d;">&#x62;&#117;&#115;&#x69;&#110;&#x65;&#x73;&#115;&#64;&#101;&#x78;&#97;&#109;&#112;&#x6c;&#101;&#46;&#99;&#x6f;&#109;</a>&rdquo;;
+        // The email subject
+        $subject = &ldquo;Contact Form Submission&rdquo;;
+        // Set the from and reply-to address for the email
+        $headers = &ldquo;From: website@example.com\r\n&rdquo;
+                 . &ldquo;Reply-To: &rdquo; . $contact[&lsquo;email&rsquo;] . &ldquo;\r\n&rdquo;
+                 . &ldquo;X-Mailer: PHP/&rdquo; . phpversion();
+        // Build the body of the email
+        $mailbody = &ldquo;The contact form has been filled out.\n\n&rdquo;
+                  . &ldquo;Name: &rdquo; . $contact[&lsquo;name&rsquo;] . &ldquo;\n&rdquo;
+                  . &ldquo;Email: &rdquo; . $contact[&lsquo;email&rsquo;] . &ldquo;\n&rdquo;
+                  . &ldquo;Message:\n&rdquo; . $contact[&lsquo;message&rsquo;];
+        // Send the email
+        mail($to, $subject, $mailbody);
+        // Go to the thank you page
+        header(&ldquo;location: thankyou.html&rdquo;);
+        exit;
+    }
+}</p>
+
+<p>?>
+&lt;!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <form action="contact.php" method="post" accept-charset="utf-8" data-parsley-validate novalidate>
+        <fieldset>
+            <legend>Contact Us</legend>
+            &lt;?php if (!$valid): ?>
+                <div class="error">
+                    &lt;?php foreach($errors as $message):?>
+                        <div>&lt;?php echo htmlspecialchars($message); ?></div>
+                    &lt;?php endforeach; ?>
+                </div>
+            &lt;?php endif; ?>
+            <div class="row">
+                <label for="name">Name: </label>
+                <input id="name" type="text" name="name" value="<?php echo htmlspecialchars($contact['name']);?>&ldquo; required data-parsley-required-message="You must enter your name.&rdquo;>
+            </div>
+            <div class="row">
+                <label for="email">Email Address: </label>
+                <input id="email" type="email" name="email" value="<?php echo htmlspecialchars($contact['email']);?>&ldquo; required data-parsley-required-message="You must enter your email address.&rdquo; parsley-type-email-message=&ldquo;You must enter a valid email address.&rdquo;>
+            </div>
+            <div class="row">
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" required data-parsley-required-message="You must enter a message.">&lt;?php echo htmlspecialchars($contact[&lsquo;message&rsquo;]);?></textarea>
+            </div>
+            <div class="row">
+                <input type="submit" value="Submit">
+            </div>
+        </fieldset>
+    </form></p>
+
+<pre><code>&lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script src="//cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.2/parsley.min.js"&gt;&lt;/script&gt;
+</code></pre>
+
+<p></body>
+</html>
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a simple contact form in PHP - Part 2]]></title>
@@ -1178,533 +1525,6 @@ Even if you don&rsquo;t use the query builder it is worth it for the shorter syn
 
 <p>There is a lot more functionality I didn&rsquo;t cover so I recommend taking a look at <a href="http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html">the documentationn</a>
 for other pieces of functionality such as events, a schema manager, caching, sharding, and more.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Moving from mysql_query to PDO]]></title>
-    <link href="http://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo/"/>
-    <updated>2014-08-08T00:00:00-07:00</updated>
-    <id>http://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo</id>
-    <content type="html"><![CDATA[<p>The mysql extension has been marked as deprecated as of php 5.5.0 and will be removed completely in a future version.</p>
-
-<p>It is old and not very user friendly.</p>
-
-<p>This article will introduce PDO as a replacement.</p>
-
-<!--more-->
-
-
-<h2>Connecting to a Database</h2>
-
-<h3>Connecting with mysql_connect</h3>
-
-<pre><code class="php mysql_connect http://us2.php.net/manual/en/function.mysql-connect.php docs">$link = mysql_connect('localhost', 'user', 'password');
-mysql_select_db('database', $link);
-</code></pre>
-
-<p>The <a href="http://us3.php.net/manual/en/function.mysql-connect.php">mysql_connect</a> function returns a MySQL link identifier if the database connection was successful or FALSE if the connection was not successful.<br/>
-After connecting to the database server the database must be selected before any queries can be run on it.<br/>
-This is done with the <a href="http://us3.php.net/manual/en/function.mysql-select-db.php">mysql_select_db</a> function.</p>
-
-<h3>Connecting with PDO</h3>
-
-<pre><code class="php PDO http://us3.php.net/manual/en/pdo.construct.php docs">$dbh = new PDO('mysql:host=localhost;dbname=database', 'user', 'password');
-</code></pre>
-
-<p>The <a href="http://us3.php.net/manual/en/pdo.construct.php">PDO constructor</a> accepts a <abbr title="Data Source Name">DSN</abbr> as the first parameter and the user and password as the second and third parameter.</p>
-
-<p>This will create a new PDO instance if successful or throw a <a href="http://us3.php.net/manual/en/class.pdoexception.php">PDOException</a> if the connection fails.<br/>
-I will go into error handling later on.</p>
-
-<h2>Running a Query</h2>
-
-<h3>Running a query with mysql_query</h3>
-
-<pre><code class="php mysql_query http://us2.php.net/manual/en/function.mysql-query.php docs">$result = mysql_query("SELECT * FROM tablename", $link);
-</code></pre>
-
-<p>The <a href="http://us3.php.net/manual/en/function.mysql-query.php">mysql_query</a> function accepts the sql query as a string for the first parameter and the mysql link identifier returned from the mysql_connect function as the second parameter.<br/>
-For a successfully query it returns a resource for a query that would return a result-set such as a SELECT query and TRUE for a INSERT, UPDATE, or DELETE query.<br/>
-It returns FALSE if the query fails.</p>
-
-<h3>Running a query with PDO</h3>
-
-<pre><code class="php PDO::query http://us3.php.net/manual/en/pdo.query.php docs">$sth = $dbh-&gt;query("SELECT * FROM tablename");
-</code></pre>
-
-<p>The <a href="http://us3.php.net/manual/en/pdo.query.php">query</a> method on the PDO object accepts the sql query as its only parameter.<br/>
-By default it returns an instance of <a href="http://us3.php.net/manual/en/class.pdostatement.php">PDOStatement</a> if successful or FALSE if not.<br/>
-This can be changed my modifying the error mode for the connection.  This will be explained further in the Handling Errors section.</p>
-
-<h2>Fetching Data</h2>
-
-<h3>Fetching a single row with mysql_fetch_assoc</h3>
-
-<pre><code class="php mysql_fetch_assoc http://us2.php.net/manual/en/function.mysql-fetch-assoc.php docs">$users = array();
-$result = mysql_query("SELECT * FROM users WHERE id = 1", $link);
-$user = mysql_fetch_assoc($result)
-</code></pre>
-
-<p>To get the data from a query you can use the mysql_fetch_* functions.
-To return the data as an associative array use the <a href="http://us3.php.net/manual/en/function.mysql-fetch-assoc.php">mysql_fetch_assoc</a> function.
-To return the data as a numeric indexed array use the <a href="http://us3.php.net/manual/en/function.mysql-fetch-row.php">mysql_fetch_row</a> function.
-To return the data as an object use the <a href="http://us3.php.net/manual/en/function.mysql-fetch-object.php">mysql_fetch_object</a> function.
-It will return the next row in the result-set or FALSE of there are no more rows.</p>
-
-<h3>Fetching a single row with PDO</h3>
-
-<pre><code class="php PDOStatement::fetch http://us3.php.net/manual/en/pdostatement.fetch.php docs">$sth = $dbh-&gt;query("SELECT * FROM users WHERE id = 1");
-$user = $sth-&gt;fetch(PDO::FETCH_ASSOC);
-</code></pre>
-
-<p>You can use the <a href="http://us3.php.net/manual/en/pdostatement.fetch.php">fetch</a> method on the <a href="http://us3.php.net/manual/en/class.pdostatement.php">PDOStatement</a> object returned from the <a href="http://us3.php.net/manual/en/pdo.query.php">PDO::query</a> method.<br/>
-It accepts the fetch style as the first parameter.<br/>
-To return data as an associative array pass the PDO::FETCH_ASSOC constant.<br/>
-To return data as a numeric indexed array pass the PDO::FETCH_NUM constant.<br/>
-To return data as an object pass the PDO::FETCH_OBJ constant.</p>
-
-<h3>Fetching all rows with mysql_fetch_assoc</h3>
-
-<pre><code class="php mysql_fetch_assoc http://us2.php.net/manual/en/function.mysql-fetch-assoc.php docs">$users = array();
-$result = mysql_query("SELECT * FROM users", $link);
-while ($row = mysql_fetch_assoc($result)) {
-    $users[] = $row;
-}
-</code></pre>
-
-<p>To fetch all of the rows from a result-set you will need to loop through calling mysql_fetch_* until it returns false.<br/>
-This will result in an multi-dimensional associative array with all the records in the users table.</p>
-
-<h3>Fetching all rows with PDO::fetchAll</h3>
-
-<pre><code class="php PDOStatement::fetchAll http://us3.php.net/manual/en/pdostatement.fetchall.php docs">$sth = $dbh-&gt;query("SELECT * FROM users");
-$users = $sth-&gt;fetchAll(PDO::FETCH_ASSOC);
-</code></pre>
-
-<p>There is no need to loop to pull an entire result-set with PDO.<br/>
-Just use the <a href="http://us3.php.net/manual/en/pdostatement.fetchall.php">PDOStatement::fetchAll</a> method passing the result style you want.</p>
-
-<h3>Getting the row id of the inserted record with mysql_insert_id</h3>
-
-<pre><code class="php mysql_insert_id http://us2.php.net/manual/en/function.mysql-insert-id.php docs">mysql_query("INSERT INTO users (first_name, last_name, email_address) VALUES ('John', 'Doe', 'email@example.com')", $link);
-$id = mysql_insert_id($link);
-</code></pre>
-
-<p>After performing an insert query call <a href="http://us3.php.net/manual/en/function.mysql-insert-id.php">mysql_insert_id</a> to get the row id of the last inserted record.</p>
-
-<h3>Getting the row id of the inserted record with PDO::lastInsertId</h3>
-
-<pre><code class="php PDO::lastInsertId http://us3.php.net/manual/en/pdo.lastinsertid.php docs">$dbh-&gt;query("INSERT INTO users (first_name, last_name, email_address) VALUES ('John', 'Doe', 'email@example.com')", $link);
-$id = $dbh-&gt;lastInsertId();
-</code></pre>
-
-<p>After performing an insert query call the <a href="http://us3.php.net/manual/en/pdo.lastinsertid.php">PDO::lastInsertId</a> method to get the row id of the last inserted record.</p>
-
-<h2>Other Fetching Methods</h2>
-
-<p>One feature in PDO that isn&rsquo;t available in the mysql extension is a couple more advanced fetching methods.</p>
-
-<p>I&rsquo;ve already shown you the <a href="http://php.net/manual/en/pdostatement.fetch.php">PDOStatement::fetch</a> method to fetch a single row and the <a href="http://php.net/manual/en/pdostatement.fetchall.php">PDOStatement ::fetchAll</a> method to fetch all rows.</p>
-
-<h3>Fetching a single column from a single record</h3>
-
-<p>Say you want to pull the user id of a user with a given email address.
-You do not need any of the other user data, just the id.</p>
-
-<p>With the mysql extension you would end up with an array with one key an value.</p>
-
-<pre><code class="php Using mysql_query">$result = mysql_query("SELECT id FROM users WHERE email = 'bob@example.com'", $link);
-$row = mysql_fetch_assoc($result);
-if ($row) {
-    $id = $row['id'];
-} else {
-    $id = false;
-}
-</code></pre>
-
-<p>With PDO you can fetch the id as a scalar value</p>
-
-<pre><code class="php Using PDO">$sth = $dbh-&gt;query("SELECT id FROM users WHERE email = 'bob@example.com'");
-$id = $sth-&gt;fetchColumn();
-</code></pre>
-
-<h3>Fetching an array of scalar values</h3>
-
-<p>Now say you wanted an array of user ids for all active users.</p>
-
-<pre><code class="php Using mysql_query">$users = array();
-$result = mysql_query("SELECT id FROM users WHERE active = 1", $link);
-while ($row = mysql_fetch_assoc($result)) {
-    $users[] = $row['id'];
-}
-</code></pre>
-
-<pre><code class="php Using PDO">$sth = $dbh-&gt;query("SELECT id FROM users WHERE active = 1");
-$users = $sth-&gt;fetchAll(PDO::FETCH_COLUMN);
-</code></pre>
-
-<h3>Fetching key value pairs</h3>
-
-<p>Now say you wanted an array of users with the user id as the keys and the user&rsquo;s name as the values.</p>
-
-<pre><code class="php Using mysql_query">$users = array();
-$result = mysql_query("SELECT id, name FROM users", $link);
-while ($row = mysql_fetch_assoc($result)) {
-    $users[$row['id']] = $row['name'];
-}
-</code></pre>
-
-<pre><code class="php Using PDO">$sth = $dbh-&gt;query("SELECT id, name FROM users");
-$users = $sth-&gt;fetchAll(PDO::FETCH_KEY_PAIR);
-</code></pre>
-
-<h3>Fetching into a specific class</h3>
-
-<p>Many times you want to populate a class with result from a query.</p>
-
-<p>This is easy with PDO.</p>
-
-<pre><code class="php Fetching into a class">class User
-{
-    public $id;
-    public $name;
-    public $email;
-}
-
-$sth = $dbh-&gt;query("SELECT id, name, email FROM users WHERE id = 1");
-$users = $sth-&gt;fetch(PDO::FETCH_CLASS, 'user');
-</code></pre>
-
-<p>This isn&rsquo;t that exciting with an example as simple as this but the User class can have other methods in it or validation with the __set() magic method.<br/>
-You can also pass it to methods with type hinting to ensure you are getting the correct data.</p>
-
-<h2>Handling Errors</h2>
-
-<p>How you handle errors is an important part of developing an application.<br/>
-It cannot be assumed that the database will always be up and every query will succeed.</p>
-
-<p>Without checking if a given query was successful the code will continue running assuming that was query was successful.<br/>
-This can lead to further problems with the application.<br/>
-For example if you have a user registration form that inserts the user into the database then sends out an activation email it makes no sense to send the email unless the account was created successfully.</p>
-
-<p>A lot of example code in the wild will use the <a href="http://us3.php.net/manual/en/function.die.php">die</a> function to exit the script when a mysql_* function fails printing the database error using the <a href="http://us2.php.net/manual/en/function.mysql-error.php">mysql_error</a> function.<br/>
-This is generally not the best way to handle errors.<br/>
-Printing the errors to the screen can expose information to the user than can compromise security.</p>
-
-<p>A better idea would be to log any errors that occur and show the user a human readable error message saying something went wrong either by redirecting them to an error page or showing the message on the current page.</p>
-
-<p>For the following examples I&rsquo;m going to assume that you have defined a function names handle_error that accepts an error message and error code.
-<code>php Error Logger
-/**
- *
- * Logs error
- *
- * @param string $message Human friendly error message
- * @param string $error Error message returned from function or method that failed
- * @param int $code Error code from failed function or method
- * @param mixed $extra Any extra data you want to log.
- *
- * @return void
- */
-function log_error($message, $error = null, $code = null, $extra = null){
-    // This would log the error to an error log
-    // You could use an existing logging library or use a simple fwrite.
-    // For a good logging library I recommend monolog https://github.com/Seldaek/monolog
-}
-</code></p>
-
-<h3>Handling errors with mysql_connect and mysql_query</h3>
-
-<p>In general the mysql_* functions return FALSE when they fail.  After calling one of them you need to check the result to see if it was successful.</p>
-
-<p>The function <a href="http://us2.php.net/manual/en/function.mysql-error.php">mysql_error</a> will return a text error message of the last error that occurred and <a href="http://us2.php.net/manual/en/function.mysql-errno.php">mysql_errno</a> will return a numeric error code.</p>
-
-<pre><code class="php mysql_connect http://us2.php.net/manual/en/function.mysql-error.php docs">$link = mysql_connect('localhost', 'user', 'password');
-if ($link === false) {
-    log_error("Failed to connect to database", mysql_error(), mysql_errno());
-    // This would store the human readable message for the next request
-    flash_message("There was a problem connecting to the database. Please try again later.");
-    // This could redirect to a separate error page or just to itself
-    header('location: error.php');
-    exit;
-}
-if (mysql_select_db('database', $link) === false) {
-    log_error("Failed to select database", mysql_error(), mysql_errno());
-    // This would store the human readable message for the next request
-    flash_message("There was a problem connecting to the database. Please try again later.");
-    // This could redirect to a separate error page or just to itself
-    header('location: error.php');
-    exit;
-}
-</code></pre>
-
-<p>You can handle errors with queries much the same way.</p>
-
-<pre><code class="php mysql_query http://us2.php.net/manual/en/function.mysql-error.php docs">$result = mysql_query("INSERT INTO users (first_name, last_name, email_address) VALUES ('John', 'Doe', 'email@example.com')", $link);
-if ($result === false) {
-    log_error("Failed to insert user", mysql_error(), mysql_errno());
-    // This would store the human readable message for the next request
-    flash_message("There was a problem creating your account. Please try again later.");
-    // This could redirect to a separate error page or just to itself
-    header('location: error.php');
-    exit;
-}
-</code></pre>
-
-<h3>Handling errors with PDO</h3>
-
-<p>PDO has multiple ways of <a href="http://us3.php.net/manual/en/pdo.error-handling.php">handling errors</a>.</p>
-
-<p>There are three error modes for PDO.</p>
-
-<p>The first is PDO::ERRMODE_SILENT.<br/>
-This acts much like the mysql_* functions in that after calling a PDO method you need to check <a href="http://us3.php.net/manual/en/pdo.errorcode.php">PDO::errorCode</a> or <a href="http://us3.php.net/manual/en/pdo.errorinfo.php">PDO::errorInfo</a> to see if it was successful.</p>
-
-<p>The second error mode is PDO::ERRMODE_WARNING.<br/>
-This is much the same except an E_WARNING message is also thrown.</p>
-
-<p>The final error mode is PDO::ERRMODE_EXCEPTION.<br/>
-This one throws a <a href="http://us3.php.net/manual/en/class.pdoexception.php">PDOException</a> when an error occurs.
-This is the method I recommend and will be using it for further examples.</p>
-
-<pre><code class="php Setting the Error Mode http://us3.php.net/manual/en/pdo.error-handling.php docs">// You can set the error mode using the fourth options parameter on the constructor
-$dbh = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION));
-
-// or you can use the setAttribute method to set the error mode on an existing connection
-$dbh-&gt;setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-</code></pre>
-
-<pre><code class="php Connect with error handling  http://us3.php.net/manual/en/pdo.error-handling.php docs">try {
-    $dbh = new PDO($dsn, $user, $password, array(PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION));
-} catch (PDOException $e) {
-    log_error("Failed to connect to database", $e-&gt;getMessage(), $e-&gt;getCode(), array('exception' =&gt; $e));
-}
-</code></pre>
-
-<pre><code class="php Running a query with error handling">try {
-    $dbh-&gt;query("INVALID SQL");
-} catch (PDOException $e) {
-    log_error("Failed to run query", $e-&gt;getMessage(), $e-&gt;getCode(), array('exception' =&gt; $e));
-}
-</code></pre>
-
-<h2>Escaping Data</h2>
-
-<p>Whenever you execute a query that contains any data other than string literals you need to guard yourself against <a href="http://en.wikipedia.org/wiki/SQL_injection">SQL Injection</a>.</p>
-
-<p>All data should be escaped whether it comes from a posted form, another database query, read from a file, or returned from a web service.<br/>
-Anything that is not a hard-coded string that you typed yourself cannot be trusted and needs to be escaped.</p>
-
-<h3>Escaping data with the mysql extension</h3>
-
-<p>Escaping data with the mysql extension is done with the <a href="http://php.net/manual/en/function.mysql-real-escape-string.php">mysql_real_escape_string</a> function.</p>
-
-<pre><code class="php Escaping data with mysql_real_escape_string http://php.net/manual/en/function.mysql-real-escape-string.php">$query = sprintf("SELECT * FROM users WHERE username='%s' AND password='%s'", 
-    mysql_real_escape_string($name, $link), 
-    mysql_real_escape_string($password, $link)
-);
-$result = mysql_query($query, $link);
-if ($result === false) {
-    log_error("Failed to select user", mysql_error(), mysql_errno());
-    $user = false;
-} else {
-    $user = mysql_fetch_assoc($result)
-}
-</code></pre>
-
-<h3>Escaping data with PDO</h3>
-
-<p>PDO has a similar method of escaping data <a href="http://php.net/manual/en/pdo.quote.php">PDO::quote</a>.<br/>
-However this isn&rsquo;t the best way of handling passing data to queries with PDO.</p>
-
-<h2>Prepared Statements</h2>
-
-<p>Up until now I haven&rsquo;t covered anything that would provide a real advantage to switching to PDO.
-Sure some of the syntax is a little shorter and easier to work with but are just differences in syntax for the same features.</p>
-
-<p>Now I&rsquo;ll get to features that you just cannot do with the plain mysql extension.</p>
-
-<p>Prepared statements work a little differently than just replacing placeholders with escaped strings like you would do with the <a href="http://php.net/manual/en/function.mysql-real-escape-string.php">mysql_real_escape_string</a> function or the <a href="http://php.net/manual/en/pdo.quote.php">PDO::quote</a> method.</p>
-
-<p>With a prepared statement the query is actually sent to the database with the placeholders.
-This query is compiled and a statement is returned.
-You then send the data over separately and the database does handles all the escaping and replacing for you.
-This makes them much safer and less error prone than escaping the data yourself.</p>
-
-<p>With PDO there are two ways of providing parameters for a prepared statement.</p>
-
-<pre><code class="php Question Mark Parameters http://php.net/manual/en/pdo.prepare.php">try {
-    $sth = $dbh-&gt;prepare("SELECT * FROM users WHERE username = ? AND password = ?");
-    $sth-&gt;execute(array($username, $password));
-    $user = $sth-&gt;fetch(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    log_error("Failed to select user", $e-&gt;getMessage(), $e-&gt;getCode(), array('exception' =&gt; $e));
-}
-</code></pre>
-
-<pre><code class="php Named Parameters http://php.net/manual/en/pdo.prepare.php">try {
-    $sth = $dbh-&gt;prepare("SELECT * FROM users WHERE username = :username AND password = :password");
-    $sth-&gt;execute(array(
-        'username' =&gt; $username, 
-        'password' =&gt; $password
-    ));
-    $user = $sth-&gt;fetch(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    log_error("Failed to select user", $e-&gt;getMessage(), $e-&gt;getCode(), array('exception' =&gt; $e));
-}
-</code></pre>
-
-<p>Notice that in both of these he values are not surrounded in quotes like with the mysql extension.
-Adding quotes will result in a failed query.</p>
-
-<p>I recommend always using a prepared statement if your query involves any data that you would otherwise need to escape.</p>
-
-<h3>Executing a prepared statement multiple times</h3>
-
-<p>Another big advantage to using a prepared statement is when you need to execute a query multiple times with different data, such as inserting multiple records.</p>
-
-<p>You can prepare the query and execute it multiple times.</p>
-
-<pre><code class="php Multiple Executes">$users = array(
-  array(
-    'name' =&gt; 'Bob',
-    'email' =&gt; 'bob@example.com'
-  ),array(
-    'name' =&gt; 'Steve',
-    'email' =&gt; 'steve@example.com'
-  ),array(
-    'name' =&gt; 'Carl',
-    'email' =&gt; 'carl@example.com'
-  ),array(
-    'name' =&gt; 'John',
-    'email' =&gt; 'john@example.com'
-  ),array(
-    'name' =&gt; 'Ken',
-    'email' =&gt; 'ken@example.com'
-  )
-);
-$sth = $dbh-&gt;prepare("INSERT INTO users (name, email) VALUES (:name, :email)");
-foreach ($users as $user) {
-    try {
-        $sth-&gt;execute($user);
-    } catch (PDOException $e) {
-        log_error("Failed to insert user", $e-&gt;getMessage(), $e-&gt;getCode(), array('exception' =&gt; $e));
-    }
-}
-</code></pre>
-
-<p>Because the query is only parsed and compiled by the database once executing a prepared statement multiple times will be much faster than running the full query multiple times.</p>
-
-<h3>Escaping identifiers</h3>
-
-<p>One limitation to parameters in prepared statements is that they can only be used for values.<br/>
-You use parameters for things like table or column names.</p>
-
-<p>For example the following will not work.</p>
-
-<pre><code class="php Invalid Prepared Statement">$column = $_POST['column'];
-$value = $_POST['search'];
-$sth = $dbh-&gt;prepare("SELECT * FROM users where :column = :value");
-$sth-&gt;bindValue(':column', $column);
-$sth-&gt;bindValue(':value', $value);
-$sth-&gt;execute();
-</code></pre>
-
-<p>Since you should know what columns a table has the best way to do something like this is to check the column against a whitelist of accaptible data before passing to your query.</p>
-
-<pre><code class="php Dynamic Column Names">$column = $_POST['column'];
-$value = $_POST['search'];
-
-$allowed = array('name', 'email');
-if(!in_array($column, $allowed)){
-    // throw an error and do not execute the query.
-} else {
-    $sth = $dbh-&gt;prepare("SELECT * FROM users where $column = :value");
-    $sth-&gt;bindValue(':column', $column);
-    $sth-&gt;bindValue(':value', $value);
-    $sth-&gt;execute();
-}
-</code></pre>
-
-<h2>Transactions</h2>
-
-<p>Transactions are another useful feature that isn&rsquo;t available with the mysql extension.</p>
-
-<p>Lets say you have a user table that stores the user&rsquo;s login credentials and you have a user_profile that stores extra profile data for that user with a foreign key to the user table.</p>
-
-<table>
-<thead>
-<tr>
-<th> user </th>
-<th> user_profile </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td> user_id </td>
-<td> profile_id </td>
-</tr>
-<tr>
-<td> name </td>
-<td> user_id </td>
-</tr>
-<tr>
-<td> email </td>
-<td> bio </td>
-</tr>
-<tr>
-<td> password </td>
-<td> interests </td>
-</tr>
-</tbody>
-</table>
-
-
-<p>When you add a new user you also want to add the user&rsquo;s profile and then send a welcome email to the user.</p>
-
-<h3>What happens if a query fails?</h3>
-
-<p>If the insert into the user table fails you can throw an error and not try to insert the profile.</p>
-
-<p>But what happens if the insert into the user_profile table fails?<br/>
-It could break your application to have a user without a profile.<br/>
-Do you try to delete the newly inserted user if the second query fails?</p>
-
-<p>What happens if the welcome email fails?<br/>
-What if this email is vital to the application and that if it fails you may as well have never created the account?<br/>
-Do you delete both records if it fails?</p>
-
-<p>This is a already messy and could get worse with more tables or other steps.</p>
-
-<p>Fortunately transactions can help with this.</p>
-
-<p>In this example assume the MailSender class throws an exception if the email fails to be sent.</p>
-
-<pre><code class="php PDO Transaction http://php.net/manual/en/pdo.begintransaction.php">$dbh-&gt;setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$dbh-&gt;beginTransaction();
-try {
-    $sth = $dbh-&gt;prepare("INSERT INTO user (name, email, password) VALUES (?, ?, ?)");
-    $sth-&gt;execute(array($name, $email, $password));
-    $user_id = $dbh-&gt;lastInsertId();
-    $sth-&gt;prepare("INSERT INTO user_profile (user_id, bio, interests) VALUES (?, ?, ?)");
-    $sth-&gt;execute(array($user_id, $bio, $interests));
-    $mailer = new MailSender();
-    $mailer-&gt;sendWelcomeEmail($name, $email);
-    $dbh-&gt;commit();
-} catch (Exception $e) {
-    $dbh-&gt;rollBack();
-    // handle the error
-}
-</code></pre>
-
-<p>If any of the queries fail or the mail sender fails to send the mail the executed queries will be rolled back.</p>
-
-<h2>Conclusion</h2>
-
-<p>I&rsquo;ve only scratched the surface of what PDO can do beyond the basic mysql extension.</p>
-
-<p>Once you&rsquo;ve used it a while and get used to the syntax you&rsquo;ll wonder how you ever lived without it.</p>
 ]]></content>
   </entry>
   
