@@ -4,7 +4,7 @@
   <title><![CDATA[The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-09-03T17:36:45-07:00</updated>
+  <updated>2014-09-04T08:44:18-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,24 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a simple contact form in PHP - Part 4]]></title>
+    <link href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4/"/>
+    <updated>2014-09-04T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4</id>
+    
+      <summary><![CDATA[Adding a reCAPTCHA field to a php contact form]]></summary>
+    
+    
+      <content type="html"><![CDATA[<p>In of <a href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3">part 3</a> of <a href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1">Building a simple contact form in PHP</a> we added client-side validation to our form.</p>
+
+<p>In this part we are going to add a <a href="http://en.wikipedia.org/wiki/Captcha">CAPTCHA</a> field to the form in order to reduce spam.</p>
+
+]]></content>
+    
+
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a simple contact form in PHP - Part 3]]></title>

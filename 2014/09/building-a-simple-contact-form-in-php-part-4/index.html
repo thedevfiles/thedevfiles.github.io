@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Building a simple contact form in PHP - Part 3 - The Dev Files</title>
+  <title>Building a simple contact form in PHP - Part 4 - The Dev Files</title>
   <meta name="author" content="Jonathan Bernardi">
 
   
-  <meta name="description" content="Adding client-side form validation to a php contact form.">
+  <meta name="description" content="Adding a reCAPTCHA field to a php contact form">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3">
+  <link rel="canonical" href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="The Dev Files" type="application/atom+xml">
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">Building a simple contact form in PHP - Part 3</h1>
+      <h1 class="entry-title">Building a simple contact form in PHP - Part 4</h1>
     
     
       <p class="meta">
@@ -83,7 +83,7 @@
   
 
 
-<time datetime="2014-09-03T00:00:00-07:00" pubdate data-updated="true">Sep 3<span>rd</span>, 2014</time>
+<time datetime="2014-09-04T00:00:00-07:00" pubdate data-updated="true">Sep 4<span>th</span>, 2014</time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://www.thedevfiles.com">Comments</a>
@@ -93,365 +93,22 @@
   </header>
 
 
-<div class="entry-content"><p>As we last left it in <a href="/2014/09/building-a-simple-contact-form-in-php-part-2">part 2</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1">Building a simple contact form in PHP</a> we added server-side form validation to our contact form and input filtering to the submitted data before sending out the email.</p>
+<div class="entry-content"><p>In of <a href="/2014/09/building-a-simple-contact-form-in-php-part-3">part 3</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1">Building a simple contact form in PHP</a> we added client-side validation to our form.</p>
 
-<p>In this part we are going to add some client-side validation to our contact form.</p>
+<p>In this part we are going to add a <a href="http://en.wikipedia.org/wiki/Captcha">CAPTCHA</a> field to the form in order to reduce spam.</p>
 
 <!--more-->
 
 
-<p>This is the contact form as we left it.</p>
+<p>We have validation to help prevent blank form submissions but there is still nothing to stop spam bots from sending a bunch of junk posts via some automated script.</p>
 
-<figure class='code'><figcaption><span>contact.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'> <span class="o">&lt;?</span><span class="nx">php</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$valid</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
-</span><span class='line'><span class="nv">$errors</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">$contact</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="k">null</span><span class="p">,</span>
-</span><span class='line'>    <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="k">null</span><span class="p">,</span>
-</span><span class='line'>    <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="k">null</span>
-</span><span class='line'><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Check if the form has been posted</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nv">$contact</span> <span class="o">=</span> <span class="nb">filter_input_array</span><span class="p">(</span><span class="nx">INPUT_POST</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>        <span class="s1">&#39;name&#39;</span>   <span class="o">=&gt;</span> <span class="nx">FILTER_SANITIZE_STRING</span><span class="p">,</span>
-</span><span class='line'>        <span class="s1">&#39;email&#39;</span>   <span class="o">=&gt;</span> <span class="nx">FILTER_SANITIZE_STRING</span><span class="p">,</span>
-</span><span class='line'>        <span class="s1">&#39;message&#39;</span>   <span class="o">=&gt;</span> <span class="nx">FILTER_SANITIZE_STRING</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">),</span> <span class="k">true</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;You must enter your name.&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;You must enter your email address.&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="o">!</span><span class="nb">filter_input</span><span class="p">(</span><span class="nx">INPUT_POST</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_EMAIL</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;You must enter a valid email address.&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
-</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;You must enter a message.&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$valid</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// The email address the email will be sent to</span>
-</span><span class='line'>        <span class="nv">$to</span> <span class="o">=</span> <span class="s2">&quot;business@example.com&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="c1">// The email subject</span>
-</span><span class='line'>        <span class="nv">$subject</span> <span class="o">=</span> <span class="s2">&quot;Contact Form Submission&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="c1">// Set the from and reply-to address for the email</span>
-</span><span class='line'>        <span class="nv">$headers</span> <span class="o">=</span> <span class="s2">&quot;From: website@example.com</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>                 <span class="o">.</span> <span class="s2">&quot;Reply-To: &quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>                 <span class="o">.</span> <span class="s2">&quot;X-Mailer: PHP/&quot;</span> <span class="o">.</span> <span class="nb">phpversion</span><span class="p">();</span>
-</span><span class='line'>        <span class="c1">// Build the body of the email</span>
-</span><span class='line'>        <span class="nv">$mailbody</span> <span class="o">=</span> <span class="s2">&quot;The contact form has been filled out.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-</span><span class='line'>                  <span class="o">.</span> <span class="s2">&quot;Name: &quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span class='line'>                  <span class="o">.</span> <span class="s2">&quot;Email: &quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span class='line'>                  <span class="o">.</span> <span class="s2">&quot;Message:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
-</span><span class='line'>        <span class="c1">// Send the email</span>
-</span><span class='line'>        <span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1">// Go to the thank you page</span>
-</span><span class='line'>        <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;location: thankyou.html&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">exit</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
-</span><span class='line'><span class="x">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="x">&lt;html&gt;</span>
-</span><span class='line'><span class="x">&lt;head&gt;</span>
-</span><span class='line'><span class="x">    &lt;meta charset=&quot;utf-8&quot;&gt;</span>
-</span><span class='line'><span class="x">    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;</span>
-</span><span class='line'><span class="x">    &lt;title&gt;Contact Us&lt;/title&gt;</span>
-</span><span class='line'><span class="x">    &lt;link rel=&quot;stylesheet&quot; href=&quot;styles.css&quot;&gt;</span>
-</span><span class='line'><span class="x">&lt;/head&gt;</span>
-</span><span class='line'><span class="x">&lt;body&gt;</span>
-</span><span class='line'><span class="x">    &lt;form action=&quot;contact.php&quot; method=&quot;post&quot; accept-charset=&quot;utf-8&quot;&gt;</span>
-</span><span class='line'><span class="x">        &lt;fieldset&gt;</span>
-</span><span class='line'><span class="x">            &lt;legend&gt;Contact Us&lt;/legend&gt;</span>
-</span><span class='line'><span class="x">            </span><span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$valid</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
-</span><span class='line'><span class="x">                &lt;div class=&quot;error&quot;&gt;</span>
-</span><span class='line'><span class="x">                    </span><span class="cp">&lt;?php</span> <span class="k">foreach</span><span class="p">(</span><span class="nv">$errors</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span><span class="o">:?&gt;</span>
-</span><span class='line'>                        <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$message</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
-</span><span class='line'><span class="x">                    </span><span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
-</span><span class='line'><span class="x">                &lt;/div&gt;</span>
-</span><span class='line'><span class="x">            </span><span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
-</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
-</span><span class='line'><span class="x">                &lt;label for=&quot;name&quot;&gt;Name: &lt;/label&gt;</span>
-</span><span class='line'><span class="x">                &lt;input id=&quot;name&quot; type=&quot;text&quot; name=&quot;name&quot; value=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
-</span><span class='line'><span class="x">            &lt;/div&gt;</span>
-</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
-</span><span class='line'><span class="x">                &lt;label for=&quot;email&quot;&gt;Email Address: &lt;/label&gt;</span>
-</span><span class='line'><span class="x">                &lt;input id=&quot;email&quot; type=&quot;text&quot; name=&quot;email&quot; value=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
-</span><span class='line'><span class="x">            &lt;/div&gt;</span>
-</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
-</span><span class='line'><span class="x">                &lt;label for=&quot;message&quot;&gt;Message:&lt;/label&gt;</span>
-</span><span class='line'><span class="x">                &lt;textarea id=&quot;message&quot; name=&quot;message&quot;&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&lt;/textarea&gt;</span>
-</span><span class='line'><span class="x">            &lt;/div&gt;</span>
-</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
-</span><span class='line'><span class="x">                &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;</span>
-</span><span class='line'><span class="x">            &lt;/div&gt;</span>
-</span><span class='line'><span class="x">        &lt;/fieldset&gt;</span>
-</span><span class='line'><span class="x">    &lt;/form&gt;</span>
-</span><span class='line'><span class="x">&lt;/body&gt;</span>
-</span><span class='line'><span class="x">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>A common way of reducing spam is by adding a <a href="http://en.wikipedia.org/wiki/Captcha">CAPTCHA</a> field to the form.
+These are those fields with the distorted random characters that you need to copy in order to submit the form.
+They can be annoying but they are pretty effective at stopping automated spam submissions.</p>
 
+<p>We are going to use the <a href="https://www.google.com/recaptcha/intro/index.html">reCAPTCHA</a> service and library to implement this CAPTCHA field.</p>
 
-<h2>Why Add Client-Side Validation?</h2>
-
-<p>It is important to keep in mind that client-side validation doesn&rsquo;t not provide any extra security for your application.  Circumventing it is as easy as turning off javascript in your browser.
-Implementing client-side validation without server-side validation is like not having any validation at all.
-So why even have client-side validation?  Server-Side validation will catch all of the same problems so what is the benefit?</p>
-
-<p>The reason to use client-side validation is simply to make things a bit easier on the user.
-To validate something om the server the form must be submitted and a new request is created.
-If the validation fails the browser must download and render the page again including all assets like css, and images.  Any javascript files will be run again.
-If a required form field is blank why even bother to send the request to the server in the first place just to tell you what you already know?</p>
-
-<p>For a form as small as this contact form this isn&rsquo;t really a big deal but the more fields there are and the more complicated the form is the more valuable client-side form validation becomes.</p>
-
-<h2>Adding HTML5 Client-Side Validation</h2>
-
-<p>Most browsers actually have built in client-side validation just by adding attributes to your form elements.</p>
-
-<p>Add a <code>required</code> attribute to each of the form elements.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// name</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">input</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;name&quot;</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;&lt;?php echo htmlspecialchars(</span><span class="si">$contact[&#39;name&#39;]</span><span class="s2">);?&gt;&quot;</span> <span class="nx">required</span><span class="o">&gt;</span>
-</span><span class='line'><span class="c1">// email</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">input</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;&lt;?php echo htmlspecialchars(</span><span class="si">$contact[&#39;email&#39;]</span><span class="s2">);?&gt;&quot;</span> <span class="nx">required</span><span class="o">&gt;</span>
-</span><span class='line'><span class="c1">// message</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">textarea</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;message&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;message&quot;</span><span class="o">&gt;&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&lt;/textarea&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now load up the form any try submitting a blank form.
-Depending on your browser you should see a message telling you to fill out a required field and the form isn&rsquo;t submitted.</p>
-
-<p>Here is what it looks like in Google Chrome.</p>
-
-<p><img src="/images/contact-form/part-3/html5-validation.png" alt="HTML5 Validation" /></p>
-
-<p>Now change the email input type from <code>text</code> to <code>email</code> so it looks like the following.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;</span><span class="nx">input</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;&lt;?php echo htmlspecialchars(</span><span class="si">$contact[&#39;email&#39;]</span><span class="s2">);?&gt;&quot;</span> <span class="nx">required</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now fill out the other two fields en enter something that isn&rsquo;t an email address in the email field.</p>
-
-<p>Here is what I see in Google Chrome.</p>
-
-<p><img src="/images/contact-form/part-3/html5-email-validation.png" alt="HTML5 Validation" /></p>
-
-<p>This also has the benefit of showing an email-specific keyboard on many mobile devices when the email field is filled out.</p>
-
-<h2>Javascript Form Validation using Parsley</h2>
-
-<p>While the built-in html5 validation does get the job done it tends to be ugly and you don&rsquo;t have much control over it.</p>
-
-<p>We are going to use a form validation library called <a href="http://parsleyjs.org">Parsley</a> to help us add form validation that will use the same attributes as the html5 form validation we already added.</p>
-
-<p>Add the following to the html below the form but before the closing <code>&lt;/body&gt;</code> tag.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.2/parsley.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Parsley depends on <a href="http://jquery.com">jQuery</a> so I am loading that as well as the Parsley library itself.
-I am loading both using a <a href="http://en.wikipedia.org/wiki/Content_delivery_network">CDN</a> but you could just as easily download both libraries from their websites and include them locally.</p>
-
-<p>Now that the library is included the first thing we need to do is disable the html5 form validation.<br/>
-Add a <code>novalidate</code> attribute to the <code>form</code> tag.  This will disable the built-in html5 form validation so we can have Parsley do the work.</p>
-
-<p>Next we need to tell Parsley that we want it to validate our form.<br/>
-Add a <code>data-parsley-validate</code> attribute to the <code>form</code> tag.</p>
-
-<p>The form tag should now look like the following.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;</span><span class="nx">form</span> <span class="nx">action</span><span class="o">=</span><span class="s2">&quot;contact.php&quot;</span> <span class="nx">method</span><span class="o">=</span><span class="s2">&quot;post&quot;</span> <span class="nx">accept</span><span class="o">-</span><span class="nx">charset</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span> <span class="nx">data</span><span class="o">-</span><span class="nx">parsley</span><span class="o">-</span><span class="nx">validate</span> <span class="nx">novalidate</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now load up the page and try submitting a blank form.</p>
-
-<p>You should see <code>This value is required.</code> under each of the form fields.</p>
-
-<p>Lets make it look a bit better.  Add the following to your <code>styles.css</code> file.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">ul</span><span class="nc">.parsley-errors-list</span><span class="p">{</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span><span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span><span class="m">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nt">ul</span><span class="nc">.parsley-errors-list</span> <span class="nt">li</span><span class="p">{</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span><span class="m">0</span> <span class="m">0</span> <span class="m">0</span> <span class="m">5px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span><span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">list-style-type</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">color</span><span class="o">:</span> <span class="m">#CC0000</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">font-weight</span><span class="o">:</span><span class="k">bold</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img src="/images/contact-form/part-3/parsely-validation.png" alt="HTML5 Validation" /></p>
-
-<h3>Customizing error messages</h3>
-
-<p>Now we are going to customize the error messages displayed for failed form validation.</p>
-
-<p>Add a <code>data-parsley-required-message</code> attribute to each of the form fields equal to the message you want displayed when that validation fails.
-It should look like the following.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">label</span> <span class="k">for</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="o">&gt;</span><span class="nx">Name</span><span class="o">:</span> <span class="o">&lt;/</span><span class="nx">label</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;name&quot;</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;&lt;?php echo htmlspecialchars(</span><span class="si">$contact[&#39;name&#39;]</span><span class="s2">);?&gt;&quot;</span> <span class="nx">required</span> <span class="nx">data</span><span class="o">-</span><span class="nx">parsley</span><span class="o">-</span><span class="nx">required</span><span class="o">-</span><span class="nx">message</span><span class="o">=</span><span class="s2">&quot;You must enter your name.&quot;</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nx">div</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">label</span> <span class="k">for</span><span class="o">=</span><span class="s2">&quot;email&quot;</span><span class="o">&gt;</span><span class="nx">Email</span> <span class="nx">Address</span><span class="o">:</span> <span class="o">&lt;/</span><span class="nx">label</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;email&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;&lt;?php echo htmlspecialchars(</span><span class="si">$contact[&#39;email&#39;]</span><span class="s2">);?&gt;&quot;</span> <span class="nx">required</span> <span class="nx">data</span><span class="o">-</span><span class="nx">parsley</span><span class="o">-</span><span class="nx">required</span><span class="o">-</span><span class="nx">message</span><span class="o">=</span><span class="s2">&quot;You must enter your email address.&quot;</span> <span class="nx">parsley</span><span class="o">-</span><span class="nx">type</span><span class="o">-</span><span class="nx">email</span><span class="o">-</span><span class="nx">message</span><span class="o">=</span><span class="s2">&quot;You must enter a valid email address.&quot;</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="nx">div</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">label</span> <span class="k">for</span><span class="o">=</span><span class="s2">&quot;message&quot;</span><span class="o">&gt;</span><span class="nx">Message</span><span class="o">:&lt;/</span><span class="nx">label</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="o">&lt;</span><span class="nx">textarea</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;message&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;message&quot;</span> <span class="nx">required</span> <span class="nx">data</span><span class="o">-</span><span class="nx">parsley</span><span class="o">-</span><span class="nx">required</span><span class="o">-</span><span class="nx">message</span><span class="o">=</span><span class="s2">&quot;You must enter a message.&quot;</span><span class="o">&gt;&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&lt;/textarea&gt;</span>
-</span><span class='line'><span class="x">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now the custom messages you provided will be displayed instead of the default <code>This value is required.</code> message.</p>
-
-<p><img src="/images/contact-form/part-3/parsely-messages.png" alt="HTML5 Validation" /></p>
-
-<p> The full <code>contact.php</code> should now look like the following.</p>
+<p>As we left it our contact form looked like the following.</p>
 
 <figure class='code'><figcaption><span>contact.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -649,6 +306,433 @@ It should look like the following.</p>
 </span><span class='line'><span class="x">&lt;/html&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<h2>Adding reCAPTCHA to the form</h2>
+
+<p>The first step is to go to the reCAPTCHA website and sign up for the service.
+You will need a Google account to sign up.</p>
+
+<p>Once you sign up you should receive a public and a private API key.
+Save these as you will need them later.</p>
+
+<p>Once you have an account and your api keys download the php sdk library from <a href="https://code.google.com/p/recaptcha/downloads/list?q=label:phplib-Latest">the project site</a> and unzip it in your project folder.</p>
+
+<h3>Storing the api keys</h3>
+
+<p>We can of course just put the api keys right in the script that needs them but there are advantages to creating a separate configuration file to store things like settings and credentials for our application.</p>
+
+<p>The problem with putting the configuration directly in the contact.pp script is that while we only have one form that needs a reCAPTCHA now what happens if need to add more later?
+We just put the api keys in that file as well.
+Then what happens when those keys need to change?
+We would have to open every page that uses them to change it.</p>
+
+<p>It is a lot easier to have them stored in once place no matter how many times we need them.</p>
+
+<p>This becomes even more important with things like database credentials that are used much more often.</p>
+
+<p>One of the key principals of software development is <a href="http://en.wikipedia.org/wiki/Don't_repeat_yourself">Don&rsquo;t repeat yourself</a>.</p>
+
+<p>We are also going to use this configuration file to store the <code>To</code> and <code>From</code> address we are using for our email.</p>
+
+<p>Create a file named <code>config.php</code> in the same directory as the <code>contact.php</code> page with the following content.</p>
+
+<figure class='code'><figcaption><span>config.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>  <span class="s2">&quot;recaptcha&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="s2">&quot;publickey&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;paste-your-pulic-key-here&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;privatekey&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;paste-your-private-key-here&quot;</span>
+</span><span class='line'>  <span class="p">),</span>
+</span><span class='line'>  <span class="s2">&quot;contact&quot;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="s2">&quot;to&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;business@example.com&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;from&quot;</span> <span class="o">=&gt;</span> <span class="s2">&quot;website@example.com&quot;</span>
+</span><span class='line'>  <span class="p">),</span>
+</span><span class='line'><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Replace the values with your own reCAPTCHA keys and the <code>to</code> and <code>from</code> email addresses with the ones you have been using previously.</p>
+
+<p>Now add the following to your contact.php page.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// Load config file</span>
+</span><span class='line'><span class="nv">$config</span> <span class="o">=</span> <span class="k">include</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/config.php&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will load the configuration values into a <code>$config</code> array.</p>
+
+<p>Change the initialization of the variables we are using to send the email to the following</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// The email address the email will be sent to</span>
+</span><span class='line'><span class="nv">$to</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;contact&#39;</span><span class="p">][</span><span class="s1">&#39;to&#39;</span><span class="p">];</span>
+</span><span class='line'><span class="c1">// Set the from address for the email</span>
+</span><span class='line'><span class="nv">$from</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;contact&#39;</span><span class="p">][</span><span class="s1">&#39;from&#39;</span><span class="p">];</span>
+</span><span class='line'><span class="c1">// The email subject</span>
+</span><span class='line'><span class="nv">$subject</span> <span class="o">=</span> <span class="s2">&quot;Contact Form Submission&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="c1">// Set the from and reply-to address for the email</span>
+</span><span class='line'><span class="nv">$headers</span> <span class="o">=</span> <span class="s2">&quot;From: &quot;</span> <span class="o">.</span> <span class="nv">$from</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'>         <span class="o">.</span> <span class="s2">&quot;Reply-To: &quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'>         <span class="o">.</span> <span class="s2">&quot;X-Mailer: PHP/&quot;</span> <span class="o">.</span> <span class="nb">phpversion</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Adding the reCAPTCHA field</h3>
+
+<p>First we need to include the <a href="https://code.google.com/p/recaptcha/downloads/detail?name=recaptcha-php-1.11.zip">reCAPTCHA sdk library</a> that we previously downloaded.</p>
+
+<p>Mine is unzipped into a folder named <code>recaptcha-php-1.11</code> in the project folder.  That folder should have a <code>recaptchalib.php</code> file in it.</p>
+
+<p>Add the following to the top of the <code>contact.php</code> page to include the library.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">require_once</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/recaptcha-php-1.11/recaptchalib.php&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Load up the page to make sure there are no errors.  If there are the path to the library file is incorrect.</p>
+
+<p>The reCAPTCHA library needs a variable to store its errors in.
+Add the following where we initialize our <code>$errors</code> and <code>$valid</code> variable.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$captchaerror</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we add the form field for the reCAPTCHA field.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nx">recaptcha_get_html</span><span class="p">(</span><span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;recaptcha&#39;</span><span class="p">][</span><span class="s1">&#39;publickey&#39;</span><span class="p">],</span> <span class="nv">$captchaerror</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The reCAPTCHA field should show up on the form but wont do anything until we add code to check the posted value.</p>
+
+<p><img src="/images/contact-form/part-4/reCAPTCHA.png" alt="reCAPTCHA" /></p>
+
+<p>Add another check to make sure a value was posted by changing the line that checks the other posted variables to the following.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;recaptcha_challenge_field&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;recaptcha_response_field&#39;</span><span class="p">]))</span> <span class="p">{</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Actually with the validation code we have we don&rsquo;t need to check the other form fields anymore so it can be changed to the following.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;recaptcha_challenge_field&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;recaptcha_response_field&#39;</span><span class="p">]))</span> <span class="p">{</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now add the following just after that line and before the form validation code.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$resp</span> <span class="o">=</span> <span class="nx">recaptcha_check_answer</span><span class="p">(</span>
+</span><span class='line'>    <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;recaptcha&#39;</span><span class="p">][</span><span class="s1">&#39;privatekey&#39;</span><span class="p">],</span>
+</span><span class='line'>    <span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">&quot;REMOTE_ADDR&quot;</span><span class="p">],</span>
+</span><span class='line'>    <span class="nv">$_POST</span><span class="p">[</span><span class="s2">&quot;recaptcha_challenge_field&quot;</span><span class="p">],</span>
+</span><span class='line'>    <span class="nv">$_POST</span><span class="p">[</span><span class="s2">&quot;recaptcha_response_field&quot;</span><span class="p">]</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$resp</span><span class="o">-&gt;</span><span class="na">is_valid</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$captchaerror</span> <span class="o">=</span> <span class="nv">$resp</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">;</span>
+</span><span class='line'>    <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>    <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;captcha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Entered text did not match.&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This code checks the value the user submitted for the reCAPTCHA field to make sure it matches the image that was displayed to them.
+If it doesn&rsquo;t it marks the form for failed validation.</p>
+
+<p>Our full <code>contact.php</code> script should now look like the following.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">require_once</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/recaptcha-php-1.11/recaptchalib.php&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$valid</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+</span><span class='line'><span class="nv">$errors</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+</span><span class='line'><span class="nv">$captchaerror</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Load config file</span>
+</span><span class='line'><span class="nv">$config</span> <span class="o">=</span> <span class="k">include</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/config.php&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$contact</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="k">null</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="k">null</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="k">null</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Check if the form has been posted</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;recaptcha_challenge_field&#39;</span><span class="p">],</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;recaptcha_response_field&#39;</span><span class="p">]))</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nv">$resp</span> <span class="o">=</span> <span class="nx">recaptcha_check_answer</span><span class="p">(</span>
+</span><span class='line'>        <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;recaptcha&#39;</span><span class="p">][</span><span class="s1">&#39;privatekey&#39;</span><span class="p">],</span>
+</span><span class='line'>        <span class="nv">$_SERVER</span><span class="p">[</span><span class="s2">&quot;REMOTE_ADDR&quot;</span><span class="p">],</span>
+</span><span class='line'>        <span class="nv">$_POST</span><span class="p">[</span><span class="s2">&quot;recaptcha_challenge_field&quot;</span><span class="p">],</span>
+</span><span class='line'>        <span class="nv">$_POST</span><span class="p">[</span><span class="s2">&quot;recaptcha_response_field&quot;</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$resp</span><span class="o">-&gt;</span><span class="na">is_valid</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$captchaerror</span> <span class="o">=</span> <span class="nv">$resp</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;captcha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Entered text did not match.&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nv">$contact</span> <span class="o">=</span> <span class="nb">filter_input_array</span><span class="p">(</span><span class="nx">INPUT_POST</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;name&#39;</span>   <span class="o">=&gt;</span> <span class="nx">FILTER_SANITIZE_STRING</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;email&#39;</span>   <span class="o">=&gt;</span> <span class="nx">FILTER_SANITIZE_STRING</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;message&#39;</span>   <span class="o">=&gt;</span> <span class="nx">FILTER_SANITIZE_STRING</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">),</span> <span class="k">true</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;You must enter your name.&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;You must enter your email address.&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="o">!</span><span class="nb">filter_input</span><span class="p">(</span><span class="nx">INPUT_POST</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="nx">FILTER_VALIDATE_EMAIL</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;You must enter a valid email address.&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nv">$valid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$errors</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;You must enter a message.&quot;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nv">$valid</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// The email address the email will be sent to</span>
+</span><span class='line'>        <span class="nv">$to</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;contact&#39;</span><span class="p">][</span><span class="s1">&#39;to&#39;</span><span class="p">];</span>
+</span><span class='line'>        <span class="c1">// Set the from address for the email</span>
+</span><span class='line'>        <span class="nv">$from</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;contact&#39;</span><span class="p">][</span><span class="s1">&#39;from&#39;</span><span class="p">];</span>
+</span><span class='line'>        <span class="c1">// The email subject</span>
+</span><span class='line'>        <span class="nv">$subject</span> <span class="o">=</span> <span class="s2">&quot;Contact Form Submission&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="c1">// Set the from and reply-to address for the email</span>
+</span><span class='line'>        <span class="nv">$headers</span> <span class="o">=</span> <span class="s2">&quot;From: &quot;</span> <span class="o">.</span> <span class="nv">$from</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'>                 <span class="o">.</span> <span class="s2">&quot;Reply-To: &quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+</span><span class='line'>                 <span class="o">.</span> <span class="s2">&quot;X-Mailer: PHP/&quot;</span> <span class="o">.</span> <span class="nb">phpversion</span><span class="p">();</span>
+</span><span class='line'>        <span class="c1">// Build the body of the email</span>
+</span><span class='line'>        <span class="nv">$mailbody</span> <span class="o">=</span> <span class="s2">&quot;The contact form has been filled out.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+</span><span class='line'>                  <span class="o">.</span> <span class="s2">&quot;Name: &quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class='line'>                  <span class="o">.</span> <span class="s2">&quot;Email: &quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span class='line'>                  <span class="o">.</span> <span class="s2">&quot;Message:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
+</span><span class='line'>        <span class="c1">// Send the email</span>
+</span><span class='line'>        <span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">);</span>
+</span><span class='line'>        <span class="c1">// Go to the thank you page</span>
+</span><span class='line'>        <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;location: thankyou.html&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">exit</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="x">&lt;html&gt;</span>
+</span><span class='line'><span class="x">&lt;head&gt;</span>
+</span><span class='line'><span class="x">    &lt;meta charset=&quot;utf-8&quot;&gt;</span>
+</span><span class='line'><span class="x">    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;</span>
+</span><span class='line'><span class="x">    &lt;title&gt;Contact Us&lt;/title&gt;</span>
+</span><span class='line'><span class="x">    &lt;link rel=&quot;stylesheet&quot; href=&quot;styles.css&quot;&gt;</span>
+</span><span class='line'><span class="x">&lt;/head&gt;</span>
+</span><span class='line'><span class="x">&lt;body&gt;</span>
+</span><span class='line'><span class="x">    &lt;form action=&quot;contact.php&quot; method=&quot;post&quot; accept-charset=&quot;utf-8&quot; data-parsley-validate novalidate&gt;</span>
+</span><span class='line'><span class="x">        &lt;fieldset&gt;</span>
+</span><span class='line'><span class="x">            &lt;legend&gt;Contact Us&lt;/legend&gt;</span>
+</span><span class='line'><span class="x">            </span><span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$valid</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">                &lt;div class=&quot;error&quot;&gt;</span>
+</span><span class='line'><span class="x">                    </span><span class="cp">&lt;?php</span> <span class="k">foreach</span><span class="p">(</span><span class="nv">$errors</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span><span class="o">:?&gt;</span>
+</span><span class='line'>                        <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$message</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+</span><span class='line'><span class="x">                    </span><span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">                &lt;/div&gt;</span>
+</span><span class='line'><span class="x">            </span><span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
+</span><span class='line'><span class="x">                &lt;label for=&quot;name&quot;&gt;Name: &lt;/label&gt;</span>
+</span><span class='line'><span class="x">                &lt;input id=&quot;name&quot; type=&quot;text&quot; name=&quot;name&quot; value=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&quot; required data-parsley-required-message=&quot;You must enter your name.&quot;&gt;</span>
+</span><span class='line'><span class="x">            &lt;/div&gt;</span>
+</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
+</span><span class='line'><span class="x">                &lt;label for=&quot;email&quot;&gt;Email Address: &lt;/label&gt;</span>
+</span><span class='line'><span class="x">                &lt;input id=&quot;email&quot; type=&quot;email&quot; name=&quot;email&quot; value=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&quot; required data-parsley-required-message=&quot;You must enter your email address.&quot; parsley-type-email-message=&quot;You must enter a valid email address.&quot;&gt;</span>
+</span><span class='line'><span class="x">            &lt;/div&gt;</span>
+</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
+</span><span class='line'><span class="x">                &lt;label for=&quot;message&quot;&gt;Message:&lt;/label&gt;</span>
+</span><span class='line'><span class="x">                &lt;textarea id=&quot;message&quot; name=&quot;message&quot; required data-parsley-required-message=&quot;You must enter a message.&quot;&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&lt;/textarea&gt;</span>
+</span><span class='line'><span class="x">            &lt;/div&gt;</span>
+</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
+</span><span class='line'><span class="x">                </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nx">recaptcha_get_html</span><span class="p">(</span><span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;recaptcha&#39;</span><span class="p">][</span><span class="s1">&#39;publickey&#39;</span><span class="p">],</span> <span class="nv">$captchaerror</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'><span class="x">            &lt;/div&gt;</span>
+</span><span class='line'><span class="x">            &lt;div class=&quot;row&quot;&gt;</span>
+</span><span class='line'><span class="x">                &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;</span>
+</span><span class='line'><span class="x">            &lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">        &lt;/fieldset&gt;</span>
+</span><span class='line'><span class="x">    &lt;/form&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">    &lt;script src=&quot;//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js&quot;&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="x">    &lt;script src=&quot;//cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.2/parsley.min.js&quot;&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="x">&lt;/body&gt;</span>
+</span><span class='line'><span class="x">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
 </div>
 
 
@@ -671,7 +755,7 @@ It should look like the following.</p>
   
 
 
-<time datetime="2014-09-03T00:00:00-07:00" pubdate data-updated="true">Sep 3<span>rd</span>, 2014</time>
+<time datetime="2014-09-04T00:00:00-07:00" pubdate data-updated="true">Sep 4<span>th</span>, 2014</time>
       
 
 <span class="categories">
@@ -685,7 +769,7 @@ It should look like the following.</p>
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/" data-via="thejonbernardi" data-counturl="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4/" data-via="thejonbernardi" data-counturl="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -696,10 +780,8 @@ It should look like the following.</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/2014/09/building-a-simple-contact-form-in-php-part-2/" title="Previous Post: Building a simple contact form in PHP - Part 2">&laquo; Building a simple contact form in PHP - Part 2</a>
+        <a class="basic-alignment left" href="/2014/09/building-a-simple-contact-form-in-php-part-3/" title="Previous Post: Building a simple contact form in PHP - Part 3">&laquo; Building a simple contact form in PHP - Part 3</a>
       
-      
-        <a class="basic-alignment right" href="/2014/09/building-a-simple-contact-form-in-php-part-4/" title="Next Post: Building a simple contact form in PHP - Part 4">Building a simple contact form in PHP - Part 4 &raquo;</a>
       
     </p>
   </footer>
@@ -802,8 +884,8 @@ It should look like the following.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/';
-        var disqus_url = 'http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/';
+        var disqus_identifier = 'http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4/';
+        var disqus_url = 'http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4/';
         var disqus_script = 'embed.js';
         function disqus_config() {
             this.callbacks.onNewComment = [function(comment) {

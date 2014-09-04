@@ -4,7 +4,7 @@
   <title><![CDATA[Category: mail | The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/category/mail/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-09-03T17:36:45-07:00</updated>
+  <updated>2014-09-04T08:44:18-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,385 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a simple contact form in PHP - Part 4]]></title>
+    <link href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4/"/>
+    <updated>2014-09-04T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4</id>
+    <content type="html"><![CDATA[<p>In of <a href="/2014/09/building-a-simple-contact-form-in-php-part-3">part 3</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1">Building a simple contact form in PHP</a> we added client-side validation to our form.</p>
+
+<p>In this part we are going to add a <a href="http://en.wikipedia.org/wiki/Captcha">CAPTCHA</a> field to the form in order to reduce spam.</p>
+
+<!--more-->
+
+
+<p>We have validation to help prevent blank form submissions but there is still nothing to stop spam bots from sending a bunch of junk posts via some automated script.</p>
+
+<p>A common way of reducing spam is by adding a <a href="http://en.wikipedia.org/wiki/Captcha">CAPTCHA</a> field to the form.
+These are those fields with the distorted random characters that you need to copy in order to submit the form.
+They can be annoying but they are pretty effective at stopping automated spam submissions.</p>
+
+<p>We are going to use the <a href="https://www.google.com/recaptcha/intro/index.html">reCAPTCHA</a> service and library to implement this CAPTCHA field.</p>
+
+<p>As we left it our contact form looked like the following.</p>
+
+<pre><code class="php contact.php">&lt;?php
+
+$valid = true;
+$errors = array();
+
+$contact = array(
+    'name' =&gt; null,
+    'email' =&gt; null,
+    'message' =&gt; null
+);
+
+// Check if the form has been posted
+if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+    $contact = filter_input_array(INPUT_POST, array(
+        'name'   =&gt; FILTER_SANITIZE_STRING,
+        'email'   =&gt; FILTER_SANITIZE_STRING,
+        'message'   =&gt; FILTER_SANITIZE_STRING,
+    ), true);
+    if (empty($contact['name'])) {
+        $valid = false;
+        $errors['name'] = "You must enter your name.";
+    }
+    if (empty($contact['email'])) {
+        $valid = false;
+        $errors['email'] = "You must enter your email address.";
+    } elseif (!filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)) {
+        $valid = false;
+        $errors['email'] = "You must enter a valid email address.";
+    }
+    if (empty($contact['message'])) {
+        $valid = false;
+        $errors['message'] = "You must enter a message.";
+    }
+    if ($valid) {
+        // The email address the email will be sent to
+        $to = "business@example.com";
+        // The email subject
+        $subject = "Contact Form Submission";
+        // Set the from and reply-to address for the email
+        $headers = "From: website@example.com\r\n"
+                 . "Reply-To: " . $contact['email'] . "\r\n"
+                 . "X-Mailer: PHP/" . phpversion();
+        // Build the body of the email
+        $mailbody = "The contact form has been filled out.\n\n"
+                  . "Name: " . $contact['name'] . "\n"
+                  . "Email: " . $contact['email'] . "\n"
+                  . "Message:\n" . $contact['message'];
+        // Send the email
+        mail($to, $subject, $mailbody, $headers);
+        // Go to the thank you page
+        header("location: thankyou.html");
+        exit;
+    }
+}
+
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form action="contact.php" method="post" accept-charset="utf-8" data-parsley-validate novalidate&gt;
+        &lt;fieldset&gt;
+            &lt;legend&gt;Contact Us&lt;/legend&gt;
+            &lt;?php if (!$valid): ?&gt;
+                &lt;div class="error"&gt;
+                    &lt;?php foreach($errors as $message):?&gt;
+                        &lt;div&gt;&lt;?php echo htmlspecialchars($message); ?&gt;&lt;/div&gt;
+                    &lt;?php endforeach; ?&gt;
+                &lt;/div&gt;
+            &lt;?php endif; ?&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="name"&gt;Name: &lt;/label&gt;
+                &lt;input id="name" type="text" name="name" value="&lt;?php echo htmlspecialchars($contact['name']);?&gt;" required data-parsley-required-message="You must enter your name."&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+                &lt;input id="email" type="email" name="email" value="&lt;?php echo htmlspecialchars($contact['email']);?&gt;" required data-parsley-required-message="You must enter your email address." parsley-type-email-message="You must enter a valid email address."&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="message"&gt;Message:&lt;/label&gt;
+                &lt;textarea id="message" name="message" required data-parsley-required-message="You must enter a message."&gt;&lt;?php echo htmlspecialchars($contact['message']);?&gt;&lt;/textarea&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;input type="submit" value="Submit"&gt;
+            &lt;/div&gt;
+        &lt;/fieldset&gt;
+    &lt;/form&gt;
+
+    &lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"&gt;&lt;/script&gt;
+    &lt;script src="//cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.2/parsley.min.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h2>Adding reCAPTCHA to the form</h2>
+
+<p>The first step is to go to the reCAPTCHA website and sign up for the service.
+You will need a Google account to sign up.</p>
+
+<p>Once you sign up you should receive a public and a private API key.
+Save these as you will need them later.</p>
+
+<p>Once you have an account and your api keys download the php sdk library from <a href="https://code.google.com/p/recaptcha/downloads/list?q=label:phplib-Latest">the project site</a> and unzip it in your project folder.</p>
+
+<h3>Storing the api keys</h3>
+
+<p>We can of course just put the api keys right in the script that needs them but there are advantages to creating a separate configuration file to store things like settings and credentials for our application.</p>
+
+<p>The problem with putting the configuration directly in the contact.pp script is that while we only have one form that needs a reCAPTCHA now what happens if need to add more later?
+We just put the api keys in that file as well.
+Then what happens when those keys need to change?
+We would have to open every page that uses them to change it.</p>
+
+<p>It is a lot easier to have them stored in once place no matter how many times we need them.</p>
+
+<p>This becomes even more important with things like database credentials that are used much more often.</p>
+
+<p>One of the key principals of software development is <a href="http://en.wikipedia.org/wiki/Don't_repeat_yourself">Don&rsquo;t repeat yourself</a>.</p>
+
+<p>We are also going to use this configuration file to store the <code>To</code> and <code>From</code> address we are using for our email.</p>
+
+<p>Create a file named <code>config.php</code> in the same directory as the <code>contact.php</code> page with the following content.</p>
+
+<pre><code class="php config.php">&lt;?php
+return array(
+  "recaptcha" =&gt; array(
+    "publickey" =&gt; "paste-your-pulic-key-here",
+    "privatekey" =&gt; "paste-your-private-key-here"
+  ),
+  "contact" =&gt; array(
+    "to" =&gt; "business@example.com",
+    "from" =&gt; "website@example.com"
+  ),
+);
+</code></pre>
+
+<p>Replace the values with your own reCAPTCHA keys and the <code>to</code> and <code>from</code> email addresses with the ones you have been using previously.</p>
+
+<p>Now add the following to your contact.php page.</p>
+
+<pre><code class="php">// Load config file
+$config = include(__DIR__ . '/config.php');
+</code></pre>
+
+<p>This will load the configuration values into a <code>$config</code> array.</p>
+
+<p>Change the initialization of the variables we are using to send the email to the following</p>
+
+<pre><code class="php">// The email address the email will be sent to
+$to = $config['contact']['to'];
+// Set the from address for the email
+$from = $config['contact']['from'];
+// The email subject
+$subject = "Contact Form Submission";
+// Set the from and reply-to address for the email
+$headers = "From: " . $from . "\r\n"
+         . "Reply-To: " . $contact['email'] . "\r\n"
+         . "X-Mailer: PHP/" . phpversion();
+</code></pre>
+
+<h3>Adding the reCAPTCHA field</h3>
+
+<p>First we need to include the <a href="https://code.google.com/p/recaptcha/downloads/detail?name=recaptcha-php-1.11.zip">reCAPTCHA sdk library</a> that we previously downloaded.</p>
+
+<p>Mine is unzipped into a folder named <code>recaptcha-php-1.11</code> in the project folder.  That folder should have a <code>recaptchalib.php</code> file in it.</p>
+
+<p>Add the following to the top of the <code>contact.php</code> page to include the library.</p>
+
+<pre><code class="php">require_once(__DIR__ . '/recaptcha-php-1.11/recaptchalib.php');
+</code></pre>
+
+<p>Load up the page to make sure there are no errors.  If there are the path to the library file is incorrect.</p>
+
+<p>The reCAPTCHA library needs a variable to store its errors in.
+Add the following where we initialize our <code>$errors</code> and <code>$valid</code> variable.</p>
+
+<pre><code class="php">$captchaerror = null;
+</code></pre>
+
+<p>Now we add the form field for the reCAPTCHA field.</p>
+
+<p>```php</p>
+
+<div class="row">
+    <?php echo recaptcha_get_html($config['recaptcha']['publickey'], $captchaerror); ?>
+</div>
+
+
+<pre><code>
+The reCAPTCHA field should show up on the form but wont do anything until we add code to check the posted value.
+
+![reCAPTCHA](/images/contact-form/part-4/reCAPTCHA.png)
+
+Add another check to make sure a value was posted by changing the line that checks the other posted variables to the following.
+</code></pre>
+
+<p>if (isset($<em>POST[&lsquo;name&rsquo;], $</em>POST[&lsquo;email&rsquo;], $<em>POST[&lsquo;message&rsquo;], $</em>POST[&lsquo;recaptcha_challenge_field&rsquo;], $_POST[&lsquo;recaptcha_response_field&rsquo;])) {
+```</p>
+
+<p>Actually with the validation code we have we don&rsquo;t need to check the other form fields anymore so it can be changed to the following.</p>
+
+<pre><code class="php">if (isset($_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field'])) {
+</code></pre>
+
+<p>Now add the following just after that line and before the form validation code.</p>
+
+<pre><code class="php">$resp = recaptcha_check_answer(
+    $config['recaptcha']['privatekey'],
+    $_SERVER["REMOTE_ADDR"],
+    $_POST["recaptcha_challenge_field"],
+    $_POST["recaptcha_response_field"]
+);
+
+if (!$resp-&gt;is_valid) {
+    $captchaerror = $resp-&gt;error;
+    $valid = false;
+    $errors['captcha'] = "Entered text did not match.";
+}
+</code></pre>
+
+<p>This code checks the value the user submitted for the reCAPTCHA field to make sure it matches the image that was displayed to them.
+If it doesn&rsquo;t it marks the form for failed validation.</p>
+
+<p>Our full <code>contact.php</code> script should now look like the following.</p>
+
+<pre><code class="php">&lt;?php
+
+require_once(__DIR__ . '/recaptcha-php-1.11/recaptchalib.php');
+
+$valid = true;
+$errors = array();
+$captchaerror = null;
+
+// Load config file
+$config = include(__DIR__ . '/config.php');
+
+$contact = array(
+    'name' =&gt; null,
+    'email' =&gt; null,
+    'message' =&gt; null
+);
+
+// Check if the form has been posted
+if (isset($_POST['recaptcha_challenge_field'],$_POST['recaptcha_response_field'])) {
+    $resp = recaptcha_check_answer(
+        $config['recaptcha']['privatekey'],
+        $_SERVER["REMOTE_ADDR"],
+        $_POST["recaptcha_challenge_field"],
+        $_POST["recaptcha_response_field"]
+    );
+
+    if (!$resp-&gt;is_valid) {
+        $captchaerror = $resp-&gt;error;
+        $valid = false;
+        $errors['captcha'] = "Entered text did not match.";
+    }
+
+    $contact = filter_input_array(INPUT_POST, array(
+        'name'   =&gt; FILTER_SANITIZE_STRING,
+        'email'   =&gt; FILTER_SANITIZE_STRING,
+        'message'   =&gt; FILTER_SANITIZE_STRING,
+    ), true);
+    if (empty($contact['name'])) {
+        $valid = false;
+        $errors['name'] = "You must enter your name.";
+    }
+    if (empty($contact['email'])) {
+        $valid = false;
+        $errors['email'] = "You must enter your email address.";
+    } elseif (!filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)) {
+        $valid = false;
+        $errors['email'] = "You must enter a valid email address.";
+    }
+    if (empty($contact['message'])) {
+        $valid = false;
+        $errors['message'] = "You must enter a message.";
+    }
+
+    if ($valid) {
+        // The email address the email will be sent to
+        $to = $config['contact']['to'];
+        // Set the from address for the email
+        $from = $config['contact']['from'];
+        // The email subject
+        $subject = "Contact Form Submission";
+        // Set the from and reply-to address for the email
+        $headers = "From: " . $from . "\r\n"
+                 . "Reply-To: " . $contact['email'] . "\r\n"
+                 . "X-Mailer: PHP/" . phpversion();
+        // Build the body of the email
+        $mailbody = "The contact form has been filled out.\n\n"
+                  . "Name: " . $contact['name'] . "\n"
+                  . "Email: " . $contact['email'] . "\n"
+                  . "Message:\n" . $contact['message'];
+        // Send the email
+        mail($to, $subject, $mailbody, $headers);
+        // Go to the thank you page
+        header("location: thankyou.html");
+        exit;
+    }
+}
+
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form action="contact.php" method="post" accept-charset="utf-8" data-parsley-validate novalidate&gt;
+        &lt;fieldset&gt;
+            &lt;legend&gt;Contact Us&lt;/legend&gt;
+            &lt;?php if (!$valid): ?&gt;
+                &lt;div class="error"&gt;
+                    &lt;?php foreach($errors as $message):?&gt;
+                        &lt;div&gt;&lt;?php echo htmlspecialchars($message); ?&gt;&lt;/div&gt;
+                    &lt;?php endforeach; ?&gt;
+                &lt;/div&gt;
+            &lt;?php endif; ?&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="name"&gt;Name: &lt;/label&gt;
+                &lt;input id="name" type="text" name="name" value="&lt;?php echo htmlspecialchars($contact['name']);?&gt;" required data-parsley-required-message="You must enter your name."&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+                &lt;input id="email" type="email" name="email" value="&lt;?php echo htmlspecialchars($contact['email']);?&gt;" required data-parsley-required-message="You must enter your email address." parsley-type-email-message="You must enter a valid email address."&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="message"&gt;Message:&lt;/label&gt;
+                &lt;textarea id="message" name="message" required data-parsley-required-message="You must enter a message."&gt;&lt;?php echo htmlspecialchars($contact['message']);?&gt;&lt;/textarea&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;?php echo recaptcha_get_html($config['recaptcha']['publickey'], $captchaerror); ?&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;input type="submit" value="Submit"&gt;
+            &lt;/div&gt;
+
+        &lt;/fieldset&gt;
+    &lt;/form&gt;
+
+    &lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"&gt;&lt;/script&gt;
+    &lt;script src="//cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.2/parsley.min.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a simple contact form in PHP - Part 3]]></title>
@@ -292,7 +671,7 @@ if (isset($<em>POST[&lsquo;name&rsquo;], $</em>POST[&lsquo;email&rsquo;], $_POST
     }
     if ($valid) {
         // The email address the email will be sent to
-        $to = &ldquo;<a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#98;&#x75;&#x73;&#x69;&#110;&#x65;&#x73;&#115;&#x40;&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#x2e;&#99;&#x6f;&#x6d;">&#x62;&#117;&#115;&#x69;&#110;&#x65;&#115;&#x73;&#64;&#x65;&#x78;&#97;&#109;&#x70;&#x6c;&#x65;&#x2e;&#99;&#111;&#109;</a>&rdquo;;
+        $to = &ldquo;<a href="&#x6d;&#97;&#x69;&#108;&#116;&#x6f;&#58;&#x62;&#x75;&#x73;&#x69;&#x6e;&#101;&#x73;&#x73;&#64;&#x65;&#x78;&#x61;&#109;&#x70;&#x6c;&#101;&#x2e;&#99;&#x6f;&#109;">&#98;&#117;&#x73;&#x69;&#x6e;&#x65;&#x73;&#x73;&#64;&#101;&#x78;&#97;&#109;&#x70;&#x6c;&#101;&#x2e;&#99;&#111;&#x6d;</a>&rdquo;;
         // The email subject
         $subject = &ldquo;Contact Form Submission&rdquo;;
         // Set the from and reply-to address for the email
