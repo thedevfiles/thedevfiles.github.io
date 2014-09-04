@@ -307,7 +307,7 @@ This should have some sort of &ldquo;Thank you for submitting&rdquo; message on 
 </span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Email: &quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
 </span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Message:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
 </span><span class='line'>    <span class="c1">// Send the email</span>
-</span><span class='line'>    <span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">);</span>
+</span><span class='line'>    <span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">);</span>
 </span><span class='line'>    <span class="c1">// Go to the thank you page</span>
 </span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;location: thankyou.html&quot;</span><span class="p">);</span>
 </span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
@@ -393,7 +393,7 @@ This should have some sort of &ldquo;Thank you for submitting&rdquo; message on 
 </span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Email: &quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
 </span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Message:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
 </span><span class='line'>    <span class="c1">// Send the email</span>
-</span><span class='line'>    <span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">);</span>
+</span><span class='line'>    <span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">);</span>
 </span><span class='line'>    <span class="c1">// Go to the thank you page</span>
 </span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;location: thankyou.html&quot;</span><span class="p">);</span>
 </span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
@@ -492,7 +492,7 @@ It should include each of the posted values.</p>
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// Send the email</span>
-</span><span class='line'><span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">);</span>
+</span><span class='line'><span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

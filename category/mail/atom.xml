@@ -4,7 +4,7 @@
   <title><![CDATA[Category: mail | The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/category/mail/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-09-03T08:23:43-07:00</updated>
+  <updated>2014-09-03T17:36:45-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -75,7 +75,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
                   . "Email: " . $contact['email'] . "\n"
                   . "Message:\n" . $contact['message'];
         // Send the email
-        mail($to, $subject, $mailbody);
+        mail($to, $subject, $mailbody, $headers);
         // Go to the thank you page
         header("location: thankyou.html");
         exit;
@@ -292,7 +292,7 @@ if (isset($<em>POST[&lsquo;name&rsquo;], $</em>POST[&lsquo;email&rsquo;], $_POST
     }
     if ($valid) {
         // The email address the email will be sent to
-        $to = &ldquo;<a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#x62;&#x75;&#x73;&#x69;&#x6e;&#x65;&#115;&#x73;&#x40;&#101;&#120;&#x61;&#109;&#x70;&#108;&#x65;&#x2e;&#99;&#111;&#109;">&#x62;&#117;&#x73;&#105;&#110;&#x65;&#115;&#115;&#x40;&#101;&#120;&#97;&#109;&#x70;&#108;&#x65;&#46;&#99;&#111;&#x6d;</a>&rdquo;;
+        $to = &ldquo;<a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#98;&#x75;&#x73;&#x69;&#110;&#x65;&#x73;&#115;&#x40;&#101;&#120;&#97;&#x6d;&#x70;&#x6c;&#x65;&#x2e;&#99;&#x6f;&#x6d;">&#x62;&#117;&#115;&#x69;&#110;&#x65;&#115;&#x73;&#64;&#x65;&#x78;&#97;&#109;&#x70;&#x6c;&#x65;&#x2e;&#99;&#111;&#109;</a>&rdquo;;
         // The email subject
         $subject = &ldquo;Contact Form Submission&rdquo;;
         // Set the from and reply-to address for the email
@@ -305,7 +305,7 @@ if (isset($<em>POST[&lsquo;name&rsquo;], $</em>POST[&lsquo;email&rsquo;], $_POST
                   . &ldquo;Email: &rdquo; . $contact[&lsquo;email&rsquo;] . &ldquo;\n&rdquo;
                   . &ldquo;Message:\n&rdquo; . $contact[&lsquo;message&rsquo;];
         // Send the email
-        mail($to, $subject, $mailbody);
+        mail($to, $subject, $mailbody, $headers);
         // Go to the thank you page
         header(&ldquo;location: thankyou.html&rdquo;);
         exit;
@@ -393,7 +393,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
               . "Email: " . $_POST['email'] . "\n"
               . "Message:\n" . $_POST['message'];
     // Send the email
-    mail($to, $subject, $mailbody);
+    mail($to, $subject, $mailbody, $headers);
     // Go to the thank you page
     header("location: thankyou.html");
     exit;
@@ -505,7 +505,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
                   . "Email: " . $_POST['email'] . "\n"
                   . "Message:\n" . $_POST['message'];
         // Send the email
-        mail($to, $subject, $mailbody);
+        mail($to, $subject, $mailbody, $headers);
         // Go to the thank you page
         header("location: thankyou.html");
         exit;
@@ -590,7 +590,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
                   . "Email: " . $_POST['email'] . "\n"
                   . "Message:\n" . $_POST['message'];
         // Send the email
-        mail($to, $subject, $mailbody);
+        mail($to, $subject, $mailbody, $headers);
         // Go to the thank you page
         header("location: thankyou.html");
         exit;
@@ -765,7 +765,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
                   . "Email: " . $contact['email'] . "\n"
                   . "Message:\n" . $contact['message'];
         // Send the email
-        mail($to, $subject, $mailbody);
+        mail($to, $subject, $mailbody, $headers);
         // Go to the thank you page
         header("location: thankyou.html");
         exit;
@@ -947,7 +947,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
               . "Email: " . $_POST['email'] . "\n"
               . "Message:\n" . $_POST['message'];
     // Send the email
-    mail($to, $subject, $mailbody);
+    mail($to, $subject, $mailbody, $headers);
     // Go to the thank you page
     header("location: thankyou.html");
     exit;
@@ -976,7 +976,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
               . "Email: " . $_POST['email'] . "\n"
               . "Message:\n" . $_POST['message'];
     // Send the email
-    mail($to, $subject, $mailbody);
+    mail($to, $subject, $mailbody, $headers);
     // Go to the thank you page
     header("location: thankyou.html");
     exit;
@@ -1055,7 +1055,7 @@ $mailbody = "The contact form has been filled out.\n\n"
 <p>Next we use the <a href="http://us3.php.net/manual/en/book.mail.php">php mail</a> function to actually send the email.</p>
 
 <pre><code class="php">// Send the email
-mail($to, $subject, $mailbody);
+mail($to, $subject, $mailbody, $headers);
 </code></pre>
 
 <p>Finally we send the user to the thankyou.html page that we created.</p>
