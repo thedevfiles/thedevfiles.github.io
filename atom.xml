@@ -4,7 +4,7 @@
   <title><![CDATA[The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-09-04T08:44:18-07:00</updated>
+  <updated>2014-09-05T08:19:42-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,24 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a simple contact form in PHP - Part 5]]></title>
+    <link href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5/"/>
+    <updated>2014-09-05T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5</id>
+    
+      <summary><![CDATA[Using Swift to send email notifications on contact form submissions.]]></summary>
+    
+    
+      <content type="html"><![CDATA[<p>In of <a href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4">part 4</a> of <a href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1">Building a simple contact form in PHP</a> we added a CAPCHA field to help reduce spam.</p>
+
+<p>In this part we are going to change the sending of the mail to use SMTP by using <a href="http://swiftmailer.org/">Swift Mailer</a>, a php mailing library.</p>
+
+]]></content>
+    
+
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a simple contact form in PHP - Part 4]]></title>

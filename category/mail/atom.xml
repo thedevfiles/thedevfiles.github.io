@@ -4,7 +4,7 @@
   <title><![CDATA[Category: mail | The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/category/mail/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-09-04T08:44:18-07:00</updated>
+  <updated>2014-09-05T08:19:42-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,464 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a simple contact form in PHP - Part 5]]></title>
+    <link href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5/"/>
+    <updated>2014-09-05T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5</id>
+    <content type="html"><![CDATA[<p>In of <a href="/2014/09/building-a-simple-contact-form-in-php-part-4">part 4</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1">Building a simple contact form in PHP</a> we added a CAPCHA field to help reduce spam.</p>
+
+<p>In this part we are going to change the sending of the mail to use SMTP by using <a href="http://swiftmailer.org/">Swift Mailer</a>, a php mailing library.</p>
+
+<!--more-->
+
+
+<p>As we left it our contact form looked like this.</p>
+
+<pre><code class="php contact.php">&lt;?php
+
+require_once(__DIR__ . '/recaptcha-php-1.11/recaptchalib.php');
+
+$valid = true;
+$errors = array();
+$captchaerror = null;
+
+// Load config file
+$config = include(__DIR__ . '/config.php');
+
+$contact = array(
+    'name' =&gt; null,
+    'email' =&gt; null,
+    'message' =&gt; null
+);
+
+// Check if the form has been posted
+if (isset($_POST['recaptcha_challenge_field'],$_POST['recaptcha_response_field'])) {
+    $resp = recaptcha_check_answer(
+        $config['recaptcha']['privatekey'],
+        $_SERVER["REMOTE_ADDR"],
+        $_POST["recaptcha_challenge_field"],
+        $_POST["recaptcha_response_field"]
+    );
+
+    if (!$resp-&gt;is_valid) {
+        $captchaerror = $resp-&gt;error;
+        $valid = false;
+        $errors['captcha'] = "Entered text did not match.";
+    }
+
+    $contact = filter_input_array(INPUT_POST, array(
+        'name'   =&gt; FILTER_SANITIZE_STRING,
+        'email'   =&gt; FILTER_SANITIZE_STRING,
+        'message'   =&gt; FILTER_SANITIZE_STRING,
+    ), true);
+    if (empty($contact['name'])) {
+        $valid = false;
+        $errors['name'] = "You must enter your name.";
+    }
+    if (empty($contact['email'])) {
+        $valid = false;
+        $errors['email'] = "You must enter your email address.";
+    } elseif (!filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)) {
+        $valid = false;
+        $errors['email'] = "You must enter a valid email address.";
+    }
+    if (empty($contact['message'])) {
+        $valid = false;
+        $errors['message'] = "You must enter a message.";
+    }
+
+    if ($valid) {
+        // The email address the email will be sent to
+        $to = "business@example.com";
+        // The email subject
+        $subject = "Contact Form Submission";
+        // Set the from and reply-to address for the email
+        $headers = "From: website@example.com\r\n"
+                 . "Reply-To: " . $contact['email'] . "\r\n"
+                 . "X-Mailer: PHP/" . phpversion();
+        // Build the body of the email
+        $mailbody = "The contact form has been filled out.\n\n"
+                  . "Name: " . $contact['name'] . "\n"
+                  . "Email: " . $contact['email'] . "\n"
+                  . "Message:\n" . $contact['message'];
+        // Send the email
+        mail($to, $subject, $mailbody, $headers);
+        // Go to the thank you page
+        header("location: thankyou.html");
+        exit;
+    }
+}
+
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form action="contact.php" method="post" accept-charset="utf-8" data-parsley-validate novalidate&gt;
+        &lt;fieldset&gt;
+            &lt;legend&gt;Contact Us&lt;/legend&gt;
+            &lt;?php if (!$valid): ?&gt;
+                &lt;div class="error"&gt;
+                    &lt;?php foreach($errors as $message):?&gt;
+                        &lt;div&gt;&lt;?php echo htmlspecialchars($message); ?&gt;&lt;/div&gt;
+                    &lt;?php endforeach; ?&gt;
+                &lt;/div&gt;
+            &lt;?php endif; ?&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="name"&gt;Name: &lt;/label&gt;
+                &lt;input id="name" type="text" name="name" value="&lt;?php echo htmlspecialchars($contact['name']);?&gt;" required data-parsley-required-message="You must enter your name."&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+                &lt;input id="email" type="email" name="email" value="&lt;?php echo htmlspecialchars($contact['email']);?&gt;" required data-parsley-required-message="You must enter your email address." parsley-type-email-message="You must enter a valid email address."&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="message"&gt;Message:&lt;/label&gt;
+                &lt;textarea id="message" name="message" required data-parsley-required-message="You must enter a message."&gt;&lt;?php echo htmlspecialchars($contact['message']);?&gt;&lt;/textarea&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;?php echo recaptcha_get_html($config['recaptcha']['publickey'], $captchaerror); ?&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;input type="submit" value="Submit"&gt;
+            &lt;/div&gt;
+
+        &lt;/fieldset&gt;
+    &lt;/form&gt;
+
+    &lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"&gt;&lt;/script&gt;
+    &lt;script src="//cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.2/parsley.min.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h2>Add the SMTP credentials to your configuration file</h2>
+
+<pre><code class="php">"mail" =&gt; array(
+    "type" =&gt; "smtp",
+    "server" =&gt; "smtp.gmail.com",
+    "port" =&gt; 587,
+    "auth" =&gt; true,
+    "username" =&gt; "email@gmail.com",
+    "password" =&gt; "yourgmailpassword"
+)
+</code></pre>
+
+<p>I am using a gmail account as an example.  Change the server, port, username, and password to whatever the settings for your email account are.</p>
+
+<h2>Adding the Swiftmailer library</h2>
+
+<p>Head over to the <a href="https://github.com/swiftmailer/swiftmailer/releases">releases page</a> for the <a href="https://github.com/swiftmailer/swiftmailer">github repository for the project</a> and download the newest release (5.2.1 at the time of writing this).</p>
+
+<p>Unzip the archive in your project folder.  After that I have a folder named <code>swiftmailer-5.2.1</code> in my project folder that contains a <code>lib</code> folder with the libraries in it.</p>
+
+<p>Now include the library at the top of your <code>contact.php</code> page.</p>
+
+<pre><code class="php">require_once(__DIR__ . '/swiftmailer-5.2.1/lib/swift_required.php');
+</code></pre>
+
+<p>Replace the line that calls the <code>mail</code> function with the following.
+You can also delete the <code>$headers</code> variable as that is no longer needed.</p>
+
+<pre><code class="php">// Create the mail
+$mail = Swift_Message::newInstance();
+$mail-&gt;setSubject($subject);
+$mail-&gt;setFrom(array($from));
+$mail-&gt;setTo(array($to));
+$mail-&gt;setReplyTo(array($contact['email'] =&gt; $contact['name']));
+$mail-&gt;setBody($mailbody);
+// Create the mail transport
+if ($config['mail']['type'] == 'smtp') {
+    // Use smtp account
+    $transport = Swift_SmtpTransport::newInstance($config['mail']['server'], $config['mail']['port']);
+    if ($config['mail']['auth']) {
+        $transport-&gt;setUsername($config['mail']['username']);
+        $transport-&gt;setPassword($config['mail']['password']);
+    }
+} else {
+    // Use mail function as fallback
+    $transport = Swift_MailTransport::newInstance();
+}
+// Create a mailer
+$mailer = Swift_Mailer::newInstance($transport);
+// Send the mail
+$result = $mailer-&gt;send($mail);
+</code></pre>
+
+<p>Lets break this down a bit.</p>
+
+<pre><code class="php">// Create the mail
+$mail = Swift_Message::newInstance();
+$mail-&gt;setSubject($subject);
+$mail-&gt;setFrom(array($from));
+$mail-&gt;setTo(array($to));
+$mail-&gt;setReplyTo(array($contact['email'] =&gt; $contact['name']));
+$mail-&gt;setBody($mailbody);
+</code></pre>
+
+<p>This code creates the mail itself as an instance of <code>Swift_Message</code>.
+It sets the subject, to, from, and reply-to addresses as well as the mail body.
+This should be apparent fairly easily just by reading the method names.</p>
+
+<pre><code class="php">// Create the mail transport
+if ($config['mail']['type'] == 'smtp') {
+    // Use smtp account
+    $transport = Swift_SmtpTransport::newInstance($config['mail']['server'], $config['mail']['port']);
+    if ($config['mail']['auth']) {
+        $transport-&gt;setUsername($config['mail']['username']);
+        $transport-&gt;setPassword($config['mail']['password']);
+    }
+} else {
+    // Use mail function as fallback
+    $transport = Swift_MailTransport::newInstance();
+}
+</code></pre>
+
+<p>We are checking if we have set the mail transport type to smtp in our config file.
+If we have we create an instance of Swift_SmtpTransport passing in the credentials and server information we have in our config file.
+Otherwise we create an instance of Swift_MailTransport which is a wrapper around the php <a href="http://us1.php.net/manual/en/function.mail.php">mail</a> function we were using previously.</p>
+
+<pre><code class="php">// Create a mailer
+$mailer = Swift_Mailer::newInstance($transport);
+// Send the mail
+$result = $mailer-&gt;send($mail);
+</code></pre>
+
+<p>The <code>Swift_Mailer</code> actually does the sending of the <code>Swift_Message</code> we created using the transport.</p>
+
+<p>Our full <code>contact.php</code> page should now look like the following</p>
+
+<pre><code class="php contact.php">&lt;?php
+
+require_once(__DIR__ . '/recaptcha-php-1.11/recaptchalib.php');
+require_once(__DIR__ . '/swiftmailer-5.2.1/lib/swift_required.php');
+
+$valid = true;
+$errors = array();
+$captchaerror = null;
+
+// Load config file
+$config = include(__DIR__ . '/config.php');
+
+$contact = array(
+    'name' =&gt; null,
+    'email' =&gt; null,
+    'message' =&gt; null
+);
+
+// Check if the form has been posted
+if (isset($_POST['recaptcha_challenge_field'],$_POST['recaptcha_response_field'])) {
+    $resp = recaptcha_check_answer(
+        $config['recaptcha']['privatekey'],
+        $_SERVER["REMOTE_ADDR"],
+        $_POST["recaptcha_challenge_field"],
+        $_POST["recaptcha_response_field"]
+    );
+
+    if (!$resp-&gt;is_valid) {
+        $captchaerror = $resp-&gt;error;
+        $valid = false;
+        $errors['captcha'] = "Entered text did not match.";
+    }
+
+    $contact = filter_input_array(INPUT_POST, array(
+        'name'   =&gt; FILTER_SANITIZE_STRING,
+        'email'   =&gt; FILTER_SANITIZE_STRING,
+        'message'   =&gt; FILTER_SANITIZE_STRING,
+    ), true);
+    if (empty($contact['name'])) {
+        $valid = false;
+        $errors['name'] = "You must enter your name.";
+    }
+    if (empty($contact['email'])) {
+        $valid = false;
+        $errors['email'] = "You must enter your email address.";
+    } elseif (!filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL)) {
+        $valid = false;
+        $errors['email'] = "You must enter a valid email address.";
+    }
+    if (empty($contact['message'])) {
+        $valid = false;
+        $errors['message'] = "You must enter a message.";
+    }
+    if ($valid) {
+        // The email address the email will be sent to
+        $to = $config['contact']['to'];
+        // Set the from address for the email
+        $from = $config['contact']['from'];
+        // The email subject
+        $subject = "Contact Form Submission";
+        // Build the body of the email
+        $mailbody = "The contact form has been filled out.\n\n"
+                  . "Name: " . $contact['name'] . "\n"
+                  . "Email: " . $contact['email'] . "\n"
+                  . "Message:\n" . $contact['message'];
+        // Create the mail
+        $mail = Swift_Message::newInstance();
+        $mail-&gt;setSubject($subject);
+        $mail-&gt;setFrom(array($from));
+        $mail-&gt;setTo(array($to));
+        $mail-&gt;setReplyTo(array($contact['email'] =&gt; $contact['name']));
+        $mail-&gt;setBody($mailbody);
+        // Create the mail transport
+        if ($config['mail']['type'] == 'smtp') {
+            // Use smtp account
+            $transport = Swift_SmtpTransport::newInstance($config['mail']['server'], $config['mail']['port']);
+            if ($config['mail']['auth']) {
+                $transport-&gt;setUsername($config['mail']['username']);
+                $transport-&gt;setPassword($config['mail']['password']);
+            }
+        } else {
+            // Use mail function as fallback
+            $transport = Swift_MailTransport::newInstance();
+        }
+        // Create a mailer
+        $mailer = Swift_Mailer::newInstance($transport);
+        // Send the mail
+        $result = $mailer-&gt;send($mail);
+
+        // Go to the thank you page
+        header("location: thankyou.html");
+        exit;
+    }
+}
+
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;form action="contact.php" method="post" accept-charset="utf-8" data-parsley-validate novalidate&gt;
+        &lt;fieldset&gt;
+            &lt;legend&gt;Contact Us&lt;/legend&gt;
+            &lt;?php if (!$valid): ?&gt;
+                &lt;div class="error"&gt;
+                    &lt;?php foreach($errors as $message):?&gt;
+                        &lt;div&gt;&lt;?php echo htmlspecialchars($message); ?&gt;&lt;/div&gt;
+                    &lt;?php endforeach; ?&gt;
+                &lt;/div&gt;
+            &lt;?php endif; ?&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="name"&gt;Name: &lt;/label&gt;
+                &lt;input id="name" type="text" name="name" value="&lt;?php echo htmlspecialchars($contact['name']);?&gt;" required data-parsley-required-message="You must enter your name."&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+                &lt;input id="email" type="email" name="email" value="&lt;?php echo htmlspecialchars($contact['email']);?&gt;" required data-parsley-required-message="You must enter your email address." parsley-type-email-message="You must enter a valid email address."&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;label for="message"&gt;Message:&lt;/label&gt;
+                &lt;textarea id="message" name="message" required data-parsley-required-message="You must enter a message."&gt;&lt;?php echo htmlspecialchars($contact['message']);?&gt;&lt;/textarea&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;?php echo recaptcha_get_html($config['recaptcha']['publickey'], $captchaerror); ?&gt;
+            &lt;/div&gt;
+            &lt;div class="row"&gt;
+                &lt;input type="submit" value="Submit"&gt;
+            &lt;/div&gt;
+        &lt;/fieldset&gt;
+    &lt;/form&gt;
+
+    &lt;script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"&gt;&lt;/script&gt;
+    &lt;script src="//cdnjs.cloudflare.com/ajax/libs/parsley.js/2.0.2/parsley.min.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3>Other features of Swiftmailer</h3>
+
+<p>Swiftmailer has a lot more functionality than we are using for our application.</p>
+
+<p>It can send html and/or multipart emails.
+It can send attachments and inline/embeded images.
+It have more transports than just the <code>smtp</code> and <code>mail</code> as well.</p>
+
+<p>I suggest taking a look at the <a href="http://swiftmailer.org/docs/introduction.html">documentation </a> for more on what it can do.</p>
+
+<h2>Using a transactional email service</h2>
+
+<p>Now that we are using a mailing library that supports SMTP we can use a transactional email service like <a href="https://mandrill.com/">Mandrill</a> or <a href="http://www.mailgun.com/">Mailgun</a> to handle the email sending.</p>
+
+<p>There are a number of advantages to using a transactional email service rather than just using a normal email account over SMTP or the server itself with the <code>mail</code> function.</p>
+
+<p>These services are built for the enterprise and can handle large volumes of email and have very high uptime.  Your email account on your <a href="http://cpanel.net/">cPanel</a> shared hosting account isn&rsquo;t.
+Even beefier solutions like <a href="http://office.microsoft.com/en-us/exchange/">Exchange</a> or <a href="http://www.google.com/enterprise/apps/business/index.html">Google Apps for Business</a> are built more for people than web applications.</p>
+
+<p>They tend to be very affordable.
+<a href="https://mandrill.com/pricing/">Mandrill</a> gives you 12,000 emails a month for free and <a href="http://www.mailgun.com/">Mailgun</a> gives you 10,000.  <a href="http://aws.amazon.com/ses/pricing/">Amazon SES</a> charges $0.10 per thousand emails.
+This means unless you are sending tens of thousands of emails a month you wont have to pay a thing and even if you are it will only be a couple dollars a month.</p>
+
+<p>Transaction services generally give you great reporting including things like bounce rates, open rates, and even logs of every email sent through the service.
+This alone in enough to make it worth using even for small sites that don&rsquo;t send out much.</p>
+
+<h3>Setting up the transactional email service</h3>
+
+<p>I&rsquo;m going to be using <a href="https://mandrill.com/">Mandrill</a> as en example but you can use any service you want.</p>
+
+<p>The first step is obviously to sign up for the service.</p>
+
+<p>The next step is to get the SMTP credentials for the account.
+For Mandrill you can find this under <code>Settings</code>.</p>
+
+<p>For Mandrill they will look something like this.</p>
+
+<table>
+<thead>
+<tr>
+<th>  </th>
+<th>  </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td> Host </td>
+<td> smtp.mandrillapp.com </td>
+</tr>
+<tr>
+<td> Port </td>
+<td> 587 </td>
+</tr>
+<tr>
+<td> SMTP Username </td>
+<td> emailaddress </td>
+</tr>
+<tr>
+<td> SMTP Password </td>
+<td> any valid API key </td>
+</tr>
+</tbody>
+</table>
+
+
+<p>You can generate an API Key at the bottom of the same page.</p>
+
+<p>Next edit the mail section of the <code>config.php</code> page like the following.</p>
+
+<pre><code class="php">"mail" =&gt; array(
+    "type" =&gt; "smtp",
+    "server" =&gt; "smtp.mandrillapp.com",
+    "port" =&gt; 587,
+    "auth" =&gt; true,
+    "username" =&gt; "youremailaddress",
+    "password" =&gt; "yourapikey"
+  )
+</code></pre>
+
+<p>That is all you have to do.  No code changes are necessary.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a simple contact form in PHP - Part 4]]></title>
@@ -671,7 +1129,7 @@ if (isset($<em>POST[&lsquo;name&rsquo;], $</em>POST[&lsquo;email&rsquo;], $_POST
     }
     if ($valid) {
         // The email address the email will be sent to
-        $to = &ldquo;<a href="&#x6d;&#97;&#x69;&#108;&#116;&#x6f;&#58;&#x62;&#x75;&#x73;&#x69;&#x6e;&#101;&#x73;&#x73;&#64;&#x65;&#x78;&#x61;&#109;&#x70;&#x6c;&#101;&#x2e;&#99;&#x6f;&#109;">&#98;&#117;&#x73;&#x69;&#x6e;&#x65;&#x73;&#x73;&#64;&#101;&#x78;&#97;&#109;&#x70;&#x6c;&#101;&#x2e;&#99;&#111;&#x6d;</a>&rdquo;;
+        $to = &ldquo;<a href="&#109;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#98;&#x75;&#x73;&#105;&#110;&#101;&#115;&#115;&#64;&#x65;&#x78;&#x61;&#109;&#112;&#108;&#x65;&#x2e;&#x63;&#111;&#109;">&#98;&#x75;&#x73;&#105;&#x6e;&#101;&#x73;&#x73;&#64;&#101;&#120;&#x61;&#109;&#x70;&#x6c;&#x65;&#x2e;&#x63;&#x6f;&#109;</a>&rdquo;;
         // The email subject
         $subject = &ldquo;Contact Form Submission&rdquo;;
         // Set the from and reply-to address for the email
