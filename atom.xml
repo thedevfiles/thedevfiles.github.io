@@ -4,7 +4,7 @@
   <title><![CDATA[The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-09-05T10:43:01-07:00</updated>
+  <updated>2014-09-08T08:29:58-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,26 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Managing Dependencies with Composer]]></title>
+    <link href="http://www.thedevfiles.com/2014/09/managing-dependencies-with-composer/"/>
+    <updated>2014-09-08T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/09/managing-dependencies-with-composer</id>
+    
+      <summary><![CDATA[Using composer to manage dependencies.]]></summary>
+    
+    
+      <content type="html"><![CDATA[<p><a href="http://getcomposer.org">Composer</a> is a package manager for PHP much like <a href="https://rubygems.org/">gem</a> is for ruby or <a href="https://www.npmjs.org/">npm</a> is for node.</p>
+
+<p>It allows you to define libraries that your application depends on and will install them for you as well a their own dependencies.</p>
+
+<p>It also includes an autoloader to load classes in both the installed packages as well as your own classes.</p>
+
+]]></content>
+    
+
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a simple contact form in PHP - Part 5]]></title>

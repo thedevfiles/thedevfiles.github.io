@@ -4,7 +4,7 @@
   <title><![CDATA[Category: php | The Dev Files]]></title>
   <link href="http://www.thedevfiles.com/category/php/atom.xml" rel="self"/>
   <link href="http://www.thedevfiles.com/"/>
-  <updated>2014-09-05T10:43:01-07:00</updated>
+  <updated>2014-09-08T08:29:58-07:00</updated>
   <id>http://www.thedevfiles.com/</id>
   <author>
     <name><![CDATA[Jonathan Bernardi]]></name>
@@ -12,6 +12,173 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Managing Dependencies with Composer]]></title>
+    <link href="http://www.thedevfiles.com/2014/09/managing-dependencies-with-composer/"/>
+    <updated>2014-09-08T00:00:00-07:00</updated>
+    <id>http://www.thedevfiles.com/2014/09/managing-dependencies-with-composer</id>
+    <content type="html"><![CDATA[<p><a href="http://getcomposer.org">Composer</a> is a package manager for PHP much like <a href="https://rubygems.org/">gem</a> is for ruby or <a href="https://www.npmjs.org/">npm</a> is for node.</p>
+
+<p>It allows you to define libraries that your application depends on and will install them for you as well a their own dependencies.</p>
+
+<p>It also includes an autoloader to load classes in both the installed packages as well as your own classes.</p>
+
+<!--more-->
+
+
+<h2>Installation</h2>
+
+<p>The easiest way to install composer on a Mac or Linux based OS is to run one of the following commands from a terminal.</p>
+
+<pre><code class="bash">curl -sS https://getcomposer.org/installer | php
+</code></pre>
+
+<pre><code class="bash">php -r "readfile('https://getcomposer.org/installer');" | php
+</code></pre>
+
+<p>This will download a <code>composer.phar</code> file into the current directory.</p>
+
+<p>If you want to be able to run composer from any directory you need to move the <code>composer.phar</code> file into a directory on your path.</p>
+
+<pre><code class="bash">sudo mv composer.phar /usr/bin/composer
+</code></pre>
+
+<p>To install on windows just download the <a href="https://getcomposer.org/Composer-Setup.exe">Composer-Setup.exe</a> installer.
+This will install composer as well as add it to your path and optionally add a shell extension that will let you run composer commands from Windows Explorer.</p>
+
+<p>You can find further options for downloading and installing on <a href="https://getcomposer.org/download/">the official download page</a>.</p>
+
+<p>For the rest of this article I will assume composer is installed in the local directory as <code>composer.phar</code>.</p>
+
+<h2>Adding packages</h2>
+
+<p>Now that we have a package manager we need to install some packages.</p>
+
+<p>Composer can install packages from any git, mercurial, or subversion repository as well as <a href="http://pear.php.net/">PEAR</a> packages but the main source for composer packages is <a href="https://packagist.org/">Packagist</a>.</p>
+
+<p>To install a package we need to start by creating a <code>composer.json</code> file at the root of our project.</p>
+
+<p>To have composer create this file for you run the following command.</p>
+
+<pre><code class="bash">php composer.phar init
+</code></pre>
+
+<p>You will be asked questions about your application such as the package name, description, and authors.</p>
+
+<p>You will then be asked if you would like to define dependencies.
+You can then add dependencies and their versions.
+Composer will then create a <code>composer.json</code> file with the dependencies you defined.</p>
+
+<p>To then install the added packages run the following command.</p>
+
+<pre><code class="bash">php composer.phar install
+</code></pre>
+
+<p>This will download all of your requested packages and their dependencies and add then to the autoloader.</p>
+
+<p>To add more packages to your application open the <code>composer.json</code> file.
+There should be a <code>require</code> property with a list of your current packages.</p>
+
+<p>You can add any new packages by adding them to this list.</p>
+
+<pre><code class="json composer.json">{
+    "require": {
+        "monolog/monolog": "1.10.0",
+        "swiftmailer/swiftmailer": "5.2.1"
+    }
+}
+</code></pre>
+
+<p>To install the newly added packages or remove the deleted ones run the following command.</p>
+
+<pre><code class="bash">php composer.phar update
+</code></pre>
+
+<p>To add and install a new package in one step you can use the <code>require</code> command passing the name of the package and the version separated by a colon.</p>
+
+<pre><code class="bash">php composer.phar require symfony/filesystem:2.5.3
+</code></pre>
+
+<p>This will add the package to the <code>composer.json</code> file and install the package.</p>
+
+<h2>Updating packages</h2>
+
+<p>To update packages just change the version numbers and run the update command again.</p>
+
+<pre><code class="bash">php composer.phar update
+</code></pre>
+
+<h2>The Autoloader</h2>
+
+<p>The autoloader included in composer is very flexible and can be used to load most anything.</p>
+
+<p>To include the autoloader in your project require the <code>autoload.php</code> file located in the vendor directory.</p>
+
+<pre><code class="php">require('path/to/vendor/autoload.php');
+</code></pre>
+
+<h3>Adding your own classes to the autoloader.</h3>
+
+<p>Composer includes install packages in the autoloader automatically but you can add your own classes to the autoloader as well.</p>
+
+<p>The autoloader can be configured using the <code>autoload</code> property in the <code>composer.json</code> file.</p>
+
+<p>The autoloader supports 4 different methods for autoloading classes, psr-0, psr-4, classmap, and files.</p>
+
+<h4>PSR-0 / PSR-4</h4>
+
+<p>Composer can autoload any classes following either the <a href="http://www.php-fig.org/psr/psr-0/">PSR-0</a> or the <a href="http://www.php-fig.org/psr/psr-4/">PSR-4</a> naming standards.</p>
+
+<p>The main differences between the two is that PSR-4 can define a namespace to start at any given directory without including all namespaces in the directory tree but PSR-4 can only load classes that are namespaced.</p>
+
+<p>PSR-0 can load classes in the root namespace and can load classes using the PEAR style underscore separated classes such as the class <code>Net_URL_Mapper</code> would be located in the file <code>Net/URL/Mapper.php</code>.</p>
+
+<pre><code class="json">{
+    "autoload": {
+        "psr-0": {
+            "Zend_": "zendframework/library/"
+        },
+        "psr-4": {
+            "Bob\\Model": "app/models/"
+        }
+    }
+}
+</code></pre>
+
+<h4>Classmap and Files</h4>
+
+<p>By adding a directory to a <code>classmap</code> array composer will scan the directory and create a classmap for all classes in the directory.</p>
+
+<p>You can also add a file directly and all classes in that file will be added to the classmap.</p>
+
+<p>This can be used to load classes that do not follow the PSR-0 or PSR-4 naming standard.</p>
+
+<pre><code class="json">{
+    "autoload": {
+        "classmap": [
+            "src/library/",
+            "src/app/models/",
+            "classes/MyClass.php"
+        ]
+    }
+}
+</code></pre>
+
+<p>Files added to the <code>files</code> array will be loaded on every request.</p>
+
+<p>This can be helpful for things like functions that cannot be autoloaded.</p>
+
+<pre><code class="json">{
+    "autoload": {
+        "files": [
+            "src/library/functions.php"
+        ]
+    }
+}
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a simple contact form in PHP - Part 5]]></title>
@@ -1129,7 +1296,7 @@ if (isset($<em>POST[&lsquo;name&rsquo;], $</em>POST[&lsquo;email&rsquo;], $_POST
     }
     if ($valid) {
         // The email address the email will be sent to
-        $to = &ldquo;<a href="&#x6d;&#97;&#x69;&#108;&#116;&#x6f;&#x3a;&#98;&#117;&#x73;&#105;&#x6e;&#x65;&#115;&#x73;&#64;&#101;&#x78;&#97;&#x6d;&#x70;&#x6c;&#x65;&#x2e;&#99;&#x6f;&#109;">&#x62;&#117;&#115;&#x69;&#110;&#101;&#115;&#115;&#x40;&#x65;&#x78;&#97;&#109;&#x70;&#108;&#x65;&#x2e;&#x63;&#x6f;&#109;</a>&rdquo;;
+        $to = &ldquo;<a href="&#109;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#98;&#x75;&#x73;&#x69;&#x6e;&#101;&#x73;&#115;&#x40;&#x65;&#x78;&#97;&#109;&#x70;&#108;&#101;&#46;&#99;&#111;&#x6d;">&#98;&#117;&#x73;&#105;&#x6e;&#101;&#x73;&#x73;&#x40;&#101;&#x78;&#97;&#109;&#112;&#x6c;&#x65;&#46;&#99;&#111;&#x6d;</a>&rdquo;;
         // The email subject
         $subject = &ldquo;Contact Form Submission&rdquo;;
         // Set the from and reply-to address for the email
@@ -1657,265 +1824,6 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
 <p>Next time we are going to add some client-side form validation to make the user experience a bit more pleasant.</p>
 
 <p>We will also going to add some anti-spam protection to the form.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Building a simple contact form in PHP - Part 1]]></title>
-    <link href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/"/>
-    <updated>2014-09-01T00:00:00-07:00</updated>
-    <id>http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1</id>
-    <content type="html"><![CDATA[<p>In this series we will be building a simple contact form in php.</p>
-
-<p>It will cover sending emails and form validation.</p>
-
-<!--more-->
-
-
-<h2>Creating the Contact Form</h2>
-
-<p>We will start with the form itself.</p>
-
-<pre><code class="html contact.php">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;meta charset="utf-8"&gt;
-    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
-    &lt;title&gt;Contact Us&lt;/title&gt;
-    &lt;link rel="stylesheet" href="styles.css"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;form action="contact.php" method="post" accept-charset="utf-8"&gt;
-     &lt;fieldset&gt;
-         &lt;legend&gt;Contact Us&lt;/legend&gt;
-         &lt;div class="row"&gt;
-             &lt;label for="name"&gt;Name: &lt;/label&gt;
-             &lt;input id="name" type="text" name="name" value=""&gt;
-         &lt;/div&gt;
-         &lt;div class="row"&gt;
-             &lt;label for="email"&gt;Email Address: &lt;/label&gt;
-             &lt;input id="email" type="text" name="email" value=""&gt;
-         &lt;/div&gt;
-         &lt;div class="row"&gt;
-             &lt;label for="message"&gt;Message:&lt;/label&gt;
-             &lt;textarea id="message" name="message"&gt;&lt;/textarea&gt;
-         &lt;/div&gt;
-         &lt;div class="row"&gt;
-             &lt;input type="submit" value="Submit"&gt;
-         &lt;/div&gt;
-     &lt;/fieldset&gt;
- &lt;/form&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<p>We will also add a stylesheet with some basic styles for the form.</p>
-
-<pre><code class="css styles.css">fieldset {
-    margin:0 auto;
-    width: 235px;
-}
-legend {
-    font-weight:bold;
-    font-size:125%;
-}
-form div.row {
-    margin-bottom: 8px;
-}
-label {
-    display: block;
-    font-weight:bold;
-}
-input[type=text],input[type=email] {
-    display:block;
-    width: 400px;
-}
-
-textarea {
-    width: 400px;
-    height:200px;
-}
-</code></pre>
-
-<p>If you view the page in a browser it should look something like this.</p>
-
-<p><img src="/images/contact-form/part-1/contact-form.png" alt="Contact Form" /></p>
-
-<p>Not the prettiest form but this isn&rsquo;t a design tutorial.
-Feel free to add your own styles.</p>
-
-<p>We also will need a page to send the user to after they submit the form.
-This should have some sort of &ldquo;Thank you for submitting&rdquo; message on it.</p>
-
-<pre><code class="html thankyou.html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;meta charset="utf-8"&gt;
-    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
-    &lt;title&gt;Contact Us&lt;/title&gt;
-    &lt;link rel="stylesheet" href="styles.css"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;p&gt;Thank you for your message.&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<h2>Sending an email on form post.</h2>
-
-<p>We have a form but it doesn&rsquo;t do anything when the user submits it.</p>
-
-<p>Add the following to the top of the contact.php page above the <code>&lt;!DOCTYPE html&gt;</code> line.</p>
-
-<pre><code class="php contact.php">&lt;?php
-
-// Check if the form has been posted
-if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
-    // The email address the email will be sent to
-    $to = "business@example.com";
-    // The email subject
-    $subject = "Contact Form Submission";
-    // Set the from and reply-to address for the email
-    $headers = "From: website@example.com\r\n"
-             . "X-Mailer: PHP/" . phpversion();
-    // Build the body of the email
-    $mailbody = "The contact form has been filled out.\n\n"
-              . "Name: " . $_POST['name'] . "\n"
-              . "Email: " . $_POST['email'] . "\n"
-              . "Message:\n" . $_POST['message'];
-    // Send the email
-    mail($to, $subject, $mailbody, $headers);
-    // Go to the thank you page
-    header("location: thankyou.html");
-    exit;
-
-}
-
-?&gt;
-</code></pre>
-
-<p>The entire page should not look like this.</p>
-
-<pre><code class="php contact.php">&lt;?php
-
-// Check if the form has been posted
-if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
-    // The email address the email will be sent to
-    $to = "business@example.com";
-    // The email subject
-    $subject = "Contact Form Submission";
-    // Set the from and reply-to address for the email
-    $headers = "From: website@example.com\r\n"
-             . "X-Mailer: PHP/" . phpversion();
-    // Build the body of the email
-    $mailbody = "The contact form has been filled out.\n\n"
-              . "Name: " . $_POST['name'] . "\n"
-              . "Email: " . $_POST['email'] . "\n"
-              . "Message:\n" . $_POST['message'];
-    // Send the email
-    mail($to, $subject, $mailbody, $headers);
-    // Go to the thank you page
-    header("location: thankyou.html");
-    exit;
-
-}
-
-?&gt;
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;meta charset="utf-8"&gt;
-    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
-    &lt;title&gt;Contact Us&lt;/title&gt;
-    &lt;link rel="stylesheet" href="styles.css"&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;form action="contact.php" method="post" accept-charset="utf-8"&gt;
-     &lt;fieldset&gt;
-         &lt;legend&gt;Contact Us&lt;/legend&gt;
-         &lt;div class="row"&gt;
-             &lt;label for="name"&gt;Name: &lt;/label&gt;
-             &lt;input id="name" type="text" name="name" value=""&gt;
-         &lt;/div&gt;
-         &lt;div class="row"&gt;
-             &lt;label for="email"&gt;Email Address: &lt;/label&gt;
-             &lt;input id="email" type="text" name="email" value=""&gt;
-         &lt;/div&gt;
-         &lt;div class="row"&gt;
-             &lt;label for="message"&gt;Message:&lt;/label&gt;
-             &lt;textarea id="message" name="message"&gt;&lt;/textarea&gt;
-         &lt;/div&gt;
-         &lt;div class="row"&gt;
-             &lt;input type="submit" value="Submit"&gt;
-         &lt;/div&gt;
-     &lt;/fieldset&gt;
- &lt;/form&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
-
-<h3>How does it work?</h3>
-
-<p>First we are checking if each of the form fields have been posted.
-If they exist the user has submitted the form.</p>
-
-<pre><code class="php">if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
-</code></pre>
-
-<p>Next we define where we would like the email to be sent and what the subject of the email should be.<br/>
-Change the <code>$to</code> variable to your own email address.</p>
-
-<pre><code class="php">// The email address the email will be sent to
-$to = "business@example.com";
-// The email subject
-$subject = "Contact Form Submission";
-</code></pre>
-
-<p>The headers set the email address used for the from in the email.
-The other line indicates the application used to send the email.  In this case php.</p>
-
-<pre><code class="php">// Set the from and reply-to address for the email
-$headers = "From: website@example.com\r\n"
-         . "X-Mailer: PHP/" . phpversion();
-</code></pre>
-
-<p>We now need to build the body of the email itself.
-It should include each of the posted values.</p>
-
-<pre><code class="php">// Build the body of the email
-$mailbody = "The contact form has been filled out.\n\n"
-          . "Name: " . $_POST['name'] . "\n"
-          . "Email: " . $_POST['email'] . "\n"
-          . "Message:\n" . $_POST['message'];
-</code></pre>
-
-<p>Next we use the <a href="http://us3.php.net/manual/en/book.mail.php">php mail</a> function to actually send the email.</p>
-
-<pre><code class="php">// Send the email
-mail($to, $subject, $mailbody, $headers);
-</code></pre>
-
-<p>Finally we send the user to the thankyou.html page that we created.</p>
-
-<pre><code class="php">// Go to the thank you page
-header("location: thankyou.html");
-exit;
-</code></pre>
-
-<h2>Improving the script</h2>
-
-<p>While this script would work as is for your contact form it have a number of problems with it.</p>
-
-<p>The biggest one is that there is no form validation.<br/>
-A user can submit a blank form and it will send the email and redirect to the thankyou.html page anyway.</p>
-
-<p>The data the user is submitting is not being escaped or filtered.<br/>
-We only want plain text being submitted through the form but without any enforcement of that the user can submit anything including scripts that might cause security issues with certain email clients.</p>
-
-<p>There is nothing to help prevent spam.<br/>
-Once a spam-bot finds this script you could find your inbox full of worthless junk.</p>
-
-<p>In the next part I will tackle some of these issues.</p>
 ]]></content>
   </entry>
   
