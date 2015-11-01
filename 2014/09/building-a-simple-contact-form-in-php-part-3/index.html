@@ -89,13 +89,13 @@
 <div class="content-wrapper">
     <section class="main">
 
-            <article class="post" itemid="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/" itemscope itemtype="http://schema.org/BlogPosting">
+            <article class="post h-entry" itemid="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/" itemscope itemtype="http://schema.org/BlogPosting">
         <header class="post__header">
-            <h1 class="post__title" itemprop="headline">Building a simple contact form in PHP - Part 3</h1>
+            <h1 class="post__title p-name" itemprop="headline">Building a simple contact form in PHP - Part 3</h1>
 
             <h2 class="post__date">Sep 3rd, 2014</h2>
         </header>
-        <div class="post__body" itemprop="articleBody">
+        <div class="post__body e-content" itemprop="articleBody">
             <p>As we last left it in <a href="/2014/09/building-a-simple-contact-form-in-php-part-2/">part 2</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">Building a simple contact form in PHP</a> we added server-side form validation to our contact form and input filtering to the submitted data before sending out the email.</p>
 
 <p>In this part we are going to add some client-side validation to our contact form.</p>
@@ -423,21 +423,21 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
         </div>
         <footer class="post__footer">
             <ul class="past__meta">
-                <li class="post__byline">Posted by <span class="post__author" itemprop="author">Jonathan Bernardi</span></li>
+                <li class="post__byline">Posted by <span class="post__author p-author h-card" itemprop="author">Jonathan Bernardi</span></li>
                 <li>
-                    <time class="post__date--footer" itemprop="datePublished" content="2014-09-03T00:00:00-07:00"
+                    <time class="post__date--footer dt-published" itemprop="datePublished" content="2014-09-03T00:00:00-07:00"
                           datetime="2014-09-03T00:00:00-07:00">Sep 3rd, 2014</time>
                 </li>
                                     <li>
-                        <span class="post__tags">
+                        <span class="post__tags p-category">
                                                     <a class="post__tag"
                                href="/tag/mail/">mail</a>,                                                     <a class="post__tag"
                                href="/tag/php/">php</a>                                                </span>
                     </li>
                             </ul>
-            <meta itemprop="url" content="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/">
+            <meta class="u-url" itemprop="url" content="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/">
                             <meta itemprop="keywords" content="mail, php">
-                                        <meta itemprop="description" content="Adding client-side form validation to a php contact form.">
+                                        <meta class="p-summary" itemprop="description" content="Adding client-side form validation to a php contact form.">
                     </footer>
 
                     <div class="sharing">
@@ -469,12 +469,12 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
 
     </section>
     <section class="sidebar">
-    <aside class="widget widget--about">
-    <h4 class="widget__title">Jonathan Bernardi</h4>
+    <aside class="widget widget--about h-card">
+    <h4 class="widget__title p-name">Jonathan Bernardi</h4>
 
     <div class="widget__body">
         <div class="widget--about__gravatar">
-            <img src="//www.gravatar.com/avatar/7a5252ed2b4a12954535820e06fd0faa" alt="Jonathan Bernardi">
+            <img class="u-photo" src="//www.gravatar.com/avatar/7a5252ed2b4a12954535820e06fd0faa" alt="Jonathan Bernardi">
         </div>
         <div class="widget--about__social">
                             <a target="_blank" href="https://twitter.com/thejonbernardi" title="Twitter"><i class="fa fa-twitter"></i></a>
@@ -519,17 +519,17 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
     <div class="widget__body">
                     <span class="tag size2"><a href="/tag/pdo/">pdo</a></span>
             &nbsp;
-                    <span class="tag size9"><a href="/tag/php/">php</a></span>
-            &nbsp;
                     <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
             &nbsp;
                     <span class="tag size3"><a href="/tag/database/">database</a></span>
             &nbsp;
-                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
-            &nbsp;
                     <span class="tag size6"><a href="/tag/mail/">mail</a></span>
             &nbsp;
+                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
+            &nbsp;
                     <span class="tag size2"><a href="/tag/security/">security</a></span>
+            &nbsp;
+                    <span class="tag size9"><a href="/tag/php/">php</a></span>
             &nbsp;
             </div>
 </aside>
