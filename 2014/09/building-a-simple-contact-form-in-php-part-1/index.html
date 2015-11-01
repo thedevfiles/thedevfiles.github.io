@@ -1,736 +1,533 @@
-
 <!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<html>
 <head>
-  <meta charset="utf-8">
-  <title>Building a simple contact form in PHP - Part 1 - The Dev Files</title>
-  <meta name="author" content="Jonathan Bernardi">
+    <title>
+                                    Building a simple contact form in PHP - Part 1 | The Dev Files
+                        </title>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <meta name="description" content="Building a simple contact form in PHP">
+                            <meta name="author" content="Jonathan Bernardi">
+            
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/">
+                <link rel="next" href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-2/">
+                    <link rel="last" href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5/">
+        <link rel="author" href="/contact/">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    <link href="/assets/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet"
+          type="text/css"/>
 
-  
-  <meta name="description" content="Building a simple contact form in PHP">
-  
+    <link rel="apple-touch-startup-image" href="/assets/images/favicon/2048x2048.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="shortcut icon" sizes="76x76" href="/assets/images/favicon/76x76.png">
+<link rel="shortcut icon" sizes="120x120" href="/assets/images/favicon/120x120.png">
+<link rel="shortcut icon" sizes="128x128" href="/assets/images/favicon/128x128.png">
+<link rel="shortcut icon" sizes="152x152" href="/assets/images/favicon/152x152.png">
+<link rel="shortcut icon" sizes="196x196" href="/assets/images/favicon/196x196.png">
+<link rel="shortcut icon" sizes="512x512" href="/assets/images/favicon/512x512.png">
+<link rel="shortcut icon" sizes="1024x1024" href="/assets/images/favicon/1024x1024.png">
+<link rel="shortcut icon" sizes="2048x2048" href="/assets/images/favicon/2048x2048.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/assets/images/favicon/76x76.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/assets/images/favicon/120x120.png">
+<link rel="apple-touch-icon" sizes="128x128" href="/assets/images/favicon/128x128.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/assets/images/favicon/152x152.png">
+<link rel="apple-touch-icon" sizes="196x196" href="/assets/images/favicon/196x196.png">
+<link rel="apple-touch-icon" sizes="512x512" href="/assets/images/favicon/512x512.png">
+<link rel="apple-touch-icon" sizes="1024x1024" href="/assets/images/favicon/1024x1024.png">
+<link rel="apple-touch-icon" sizes="2048x2048" href="/assets/images/favicon/2048x2048.png">
 
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="The Dev Files" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">The Dev Files</a></h1>
-  
-    <h2>Development Blog of Jonathan Bernardi</h2>
-  
-</hgroup>
-
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/solarized_dark.min.css">
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml"
+          title="The Dev Files activity feed"/>
+                </head>
+<body>
+<header class="siteheader">
+    <div class="content-wrapper">
+        <h2 class="siteheader__title"><a href="/">The Dev Files</a></h2>
+        <small class="siteheader__subtitle">Development Blog of Jonathan Bernardi</small>
+    </div>
 </header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-
-  <form action="https://www.google.com/search" method="get">
-    <fieldset role="search">
-      <input type="hidden" name="q" value="site:www.thedevfiles.com" />
-      <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-    </fieldset>
-  </form>
-
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="/contact">Contact</a></li>
-</ul>
-
+<div class="menu menu--main">
+    <div class="content-wrapper">
+        <nav class="menu__nav" role="navigation">
+    <ul class="menu__links">
+        <li class="menu__item">
+            <a class="menu__link" href="/">Blog</a>
+        </li>
+        <li class="menu__item">
+            <a class="menu__link" href="/archive/">Archive</a>
+        </li>
+        <li class="menu__item">
+            <a class="menu__link" href="/contact/">Contact</a>
+        </li>
+        <li class="menu__item menu__item--rss">
+            <a class="menu__link" href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">
+                <i class="fa fa-rss"></i>
+                <span class="sr-only">RSS</span>
+            </a>
+        </li>
+    </ul>
 </nav>
-  <div id="main">
-    <div id="content">
-      <div>
-<article class="hentry" role="article">
-  
-  <header>
-    
-      <h1 class="entry-title">Building a simple contact form in PHP - Part 1</h1>
-    
-    
-      <p class="meta">
-        
+        <div class="menu__right">
+            <form class="search" action="https://www.google.com/search" method="get" role="search">
+    <input type="hidden" name="q" value="site:www.thedevfiles.com">
+    <input class="search__input" type="search" name="q" results="0" placeholder="Search">
+</form>
+        </div>
+    </div>
+</div>
 
+<div class="content-wrapper">
+    <section class="main">
 
+            <article class="post" itemid="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/" itemscope itemtype="http://schema.org/BlogPosting">
+        <header class="post__header">
+            <h1 class="post__title" itemprop="headline">Building a simple contact form in PHP - Part 1</h1>
 
-
-
-
-
-
-  
-
-
-<time datetime="2014-09-01T00:00:00-07:00" pubdate data-updated="true">Sep 1<span>st</span>, 2014</time>
-        
-           | <a href="#disqus_thread"
-             data-disqus-identifier="http://www.thedevfiles.com">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-<div class="entry-content"><p>In this series we will be building a simple contact form in php.</p>
+            <h2 class="post__date">Sep 1st, 2014</h2>
+        </header>
+        <div class="post__body" itemprop="articleBody">
+            <p>In this series we will be building a simple contact form in php.</p>
 
 <p>It will cover sending emails and form validation.</p>
 
 <!--more-->
 
-
-<h2>Creating the Contact Form</h2>
+<h2 id="creating-the-contact-form">Creating the Contact Form</h2>
 
 <p>We will start with the form itself.</p>
 
-<figure class='code'><figcaption><span>contact.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">&quot;X-UA-Compatible&quot;</span> <span class="na">content=</span><span class="s">&quot;IE=edge&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Contact Us<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;styles.css&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">&quot;contact.php&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>     <span class="nt">&lt;fieldset&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;legend&gt;</span>Contact Us<span class="nt">&lt;/legend&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>             <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;name&quot;</span><span class="nt">&gt;</span>Name: <span class="nt">&lt;/label&gt;</span>
-</span><span class='line'>             <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>             <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;email&quot;</span><span class="nt">&gt;</span>Email Address: <span class="nt">&lt;/label&gt;</span>
-</span><span class='line'>             <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;email&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;email&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>             <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;message&quot;</span><span class="nt">&gt;</span>Message:<span class="nt">&lt;/label&gt;</span>
-</span><span class='line'>             <span class="nt">&lt;textarea</span> <span class="na">id=</span><span class="s">&quot;message&quot;</span> <span class="na">name=</span><span class="s">&quot;message&quot;</span><span class="nt">&gt;&lt;/textarea&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;row&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>             <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>         <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>     <span class="nt">&lt;/fieldset&gt;</span>
-</span><span class='line'> <span class="nt">&lt;/form&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>Save the following as contact.php</p>
 
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form action="contact.php" method="post" accept-charset="utf-8"&gt;
+     &lt;fieldset&gt;
+         &lt;legend&gt;Contact Us&lt;/legend&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="name"&gt;Name: &lt;/label&gt;
+             &lt;input id="name" type="text" name="name" value=""&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+             &lt;input id="email" type="text" name="email" value=""&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="message"&gt;Message:&lt;/label&gt;
+             &lt;textarea id="message" name="message"&gt;&lt;/textarea&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;input type="submit" value="Submit"&gt;
+         &lt;/div&gt;
+     &lt;/fieldset&gt;
+ &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
 
 <p>We will also add a stylesheet with some basic styles for the form.</p>
 
-<figure class='code'><figcaption><span>styles.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">fieldset</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span><span class="m">0</span> <span class="k">auto</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">235px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nt">legend</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">font-weight</span><span class="o">:</span><span class="k">bold</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">font-size</span><span class="o">:</span><span class="m">125</span><span class="o">%</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nt">form</span> <span class="nt">div</span><span class="nc">.row</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">margin-bottom</span><span class="o">:</span> <span class="m">8px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nt">label</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">display</span><span class="o">:</span> <span class="k">block</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">font-weight</span><span class="o">:</span><span class="k">bold</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nt">input</span><span class="o">[</span><span class="nt">type</span><span class="o">=</span><span class="nt">text</span><span class="o">],</span><span class="nt">input</span><span class="o">[</span><span class="nt">type</span><span class="o">=</span><span class="nt">email</span><span class="o">]</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">display</span><span class="o">:</span><span class="k">block</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">400px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">textarea</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">400px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">height</span><span class="o">:</span><span class="m">200px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>Save the following as styles.css</p>
 
+<pre><code class="css">fieldset {
+    margin:0 auto;
+    width: 235px;
+}
+legend {
+    font-weight:bold;
+    font-size:125%;
+}
+form div.row {
+    margin-bottom: 8px;
+}
+label {
+    display: block;
+    font-weight:bold;
+}
+input[type=text],input[type=email] {
+    display:block;
+    width: 400px;
+}
+
+textarea {
+    width: 400px;
+    height:200px;
+}
+</code></pre>
 
 <p>If you view the page in a browser it should look something like this.</p>
 
 <p><img src="/images/contact-form/part-1/contact-form.png" alt="Contact Form" /></p>
 
-<p>Not the prettiest form but this isn&rsquo;t a design tutorial.
+<p>Not the prettiest form but this isn't a design tutorial.
 Feel free to add your own styles.</p>
 
 <p>We also will need a page to send the user to after they submit the form.
-This should have some sort of &ldquo;Thank you for submitting&rdquo; message on it.</p>
+This should have some sort of "Thank you for submitting" message on it.</p>
 
-<figure class='code'><figcaption><span>thankyou.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">&quot;X-UA-Compatible&quot;</span> <span class="na">content=</span><span class="s">&quot;IE=edge&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Contact Us<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;styles.css&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;p&gt;</span>Thank you for your message.<span class="nt">&lt;/p&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>Save the following as thankyou.html</p>
 
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;Thank you for your message.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
 
-<h2>Sending an email on form post.</h2>
+<h2 id="sending-an-email-on-form-post.">Sending an email on form post.</h2>
 
-<p>We have a form but it doesn&rsquo;t do anything when the user submits it.</p>
+<p>We have a form but it doesn't do anything when the user submits it.</p>
 
 <p>Add the following to the top of the contact.php page above the <code>&lt;!DOCTYPE html&gt;</code> line.</p>
 
-<figure class='code'><figcaption><span>contact.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Check if the form has been posted</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// The email address the email will be sent to</span>
-</span><span class='line'>    <span class="nv">$to</span> <span class="o">=</span> <span class="s2">&quot;business@example.com&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">// The email subject</span>
-</span><span class='line'>    <span class="nv">$subject</span> <span class="o">=</span> <span class="s2">&quot;Contact Form Submission&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">// Set the from and reply-to address for the email</span>
-</span><span class='line'>    <span class="nv">$headers</span> <span class="o">=</span> <span class="s2">&quot;From: website@example.com</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>             <span class="o">.</span> <span class="s2">&quot;X-Mailer: PHP/&quot;</span> <span class="o">.</span> <span class="nb">phpversion</span><span class="p">();</span>
-</span><span class='line'>    <span class="c1">// Build the body of the email</span>
-</span><span class='line'>    <span class="nv">$mailbody</span> <span class="o">=</span> <span class="s2">&quot;The contact form has been filled out.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-</span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Name: &quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Email: &quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Message:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
-</span><span class='line'>    <span class="c1">// Send the email</span>
-</span><span class='line'>    <span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// Go to the thank you page</span>
-</span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;location: thankyou.html&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="php">&lt;?php
 
+// Check if the form has been posted
+if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+    // The email address the email will be sent to
+    $to = "business@example.com";
+    // The email subject
+    $subject = "Contact Form Submission";
+    // Set the from and reply-to address for the email
+    $headers = "From: website@example.com\r\n"
+             . "X-Mailer: PHP/" . phpversion();
+    // Build the body of the email
+    $mailbody = "The contact form has been filled out.\n\n"
+              . "Name: " . $_POST['name'] . "\n"
+              . "Email: " . $_POST['email'] . "\n"
+              . "Message:\n" . $_POST['message'];
+    // Send the email
+    mail($to, $subject, $mailbody, $headers);
+    // Go to the thank you page
+    header("location: thankyou.html");
+    exit;
+
+}
+
+?&gt;
+</code></pre>
 
 <p>The entire page should not look like this.</p>
 
-<figure class='code'><figcaption><span>contact.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Check if the form has been posted</span>
-</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// The email address the email will be sent to</span>
-</span><span class='line'>    <span class="nv">$to</span> <span class="o">=</span> <span class="s2">&quot;business@example.com&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">// The email subject</span>
-</span><span class='line'>    <span class="nv">$subject</span> <span class="o">=</span> <span class="s2">&quot;Contact Form Submission&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="c1">// Set the from and reply-to address for the email</span>
-</span><span class='line'>    <span class="nv">$headers</span> <span class="o">=</span> <span class="s2">&quot;From: website@example.com</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>             <span class="o">.</span> <span class="s2">&quot;X-Mailer: PHP/&quot;</span> <span class="o">.</span> <span class="nb">phpversion</span><span class="p">();</span>
-</span><span class='line'>    <span class="c1">// Build the body of the email</span>
-</span><span class='line'>    <span class="nv">$mailbody</span> <span class="o">=</span> <span class="s2">&quot;The contact form has been filled out.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-</span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Name: &quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Email: &quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span class='line'>              <span class="o">.</span> <span class="s2">&quot;Message:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
-</span><span class='line'>    <span class="c1">// Send the email</span>
-</span><span class='line'>    <span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// Go to the thank you page</span>
-</span><span class='line'>    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;location: thankyou.html&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">exit</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
-</span><span class='line'><span class="x">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="x">&lt;html&gt;</span>
-</span><span class='line'><span class="x">&lt;head&gt;</span>
-</span><span class='line'><span class="x">    &lt;meta charset=&quot;utf-8&quot;&gt;</span>
-</span><span class='line'><span class="x">    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;</span>
-</span><span class='line'><span class="x">    &lt;title&gt;Contact Us&lt;/title&gt;</span>
-</span><span class='line'><span class="x">    &lt;link rel=&quot;stylesheet&quot; href=&quot;styles.css&quot;&gt;</span>
-</span><span class='line'><span class="x">&lt;/head&gt;</span>
-</span><span class='line'><span class="x">&lt;body&gt;</span>
-</span><span class='line'><span class="x">&lt;form action=&quot;contact.php&quot; method=&quot;post&quot; accept-charset=&quot;utf-8&quot;&gt;</span>
-</span><span class='line'><span class="x">     &lt;fieldset&gt;</span>
-</span><span class='line'><span class="x">         &lt;legend&gt;Contact Us&lt;/legend&gt;</span>
-</span><span class='line'><span class="x">         &lt;div class=&quot;row&quot;&gt;</span>
-</span><span class='line'><span class="x">             &lt;label for=&quot;name&quot;&gt;Name: &lt;/label&gt;</span>
-</span><span class='line'><span class="x">             &lt;input id=&quot;name&quot; type=&quot;text&quot; name=&quot;name&quot; value=&quot;&quot;&gt;</span>
-</span><span class='line'><span class="x">         &lt;/div&gt;</span>
-</span><span class='line'><span class="x">         &lt;div class=&quot;row&quot;&gt;</span>
-</span><span class='line'><span class="x">             &lt;label for=&quot;email&quot;&gt;Email Address: &lt;/label&gt;</span>
-</span><span class='line'><span class="x">             &lt;input id=&quot;email&quot; type=&quot;text&quot; name=&quot;email&quot; value=&quot;&quot;&gt;</span>
-</span><span class='line'><span class="x">         &lt;/div&gt;</span>
-</span><span class='line'><span class="x">         &lt;div class=&quot;row&quot;&gt;</span>
-</span><span class='line'><span class="x">             &lt;label for=&quot;message&quot;&gt;Message:&lt;/label&gt;</span>
-</span><span class='line'><span class="x">             &lt;textarea id=&quot;message&quot; name=&quot;message&quot;&gt;&lt;/textarea&gt;</span>
-</span><span class='line'><span class="x">         &lt;/div&gt;</span>
-</span><span class='line'><span class="x">         &lt;div class=&quot;row&quot;&gt;</span>
-</span><span class='line'><span class="x">             &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;</span>
-</span><span class='line'><span class="x">         &lt;/div&gt;</span>
-</span><span class='line'><span class="x">     &lt;/fieldset&gt;</span>
-</span><span class='line'><span class="x"> &lt;/form&gt;</span>
-</span><span class='line'><span class="x">&lt;/body&gt;</span>
-</span><span class='line'><span class="x">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="php">&lt;?php
 
+// Check if the form has been posted
+if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+    // The email address the email will be sent to
+    $to = "business@example.com";
+    // The email subject
+    $subject = "Contact Form Submission";
+    // Set the from and reply-to address for the email
+    $headers = "From: website@example.com\r\n"
+             . "X-Mailer: PHP/" . phpversion();
+    // Build the body of the email
+    $mailbody = "The contact form has been filled out.\n\n"
+              . "Name: " . $_POST['name'] . "\n"
+              . "Email: " . $_POST['email'] . "\n"
+              . "Message:\n" . $_POST['message'];
+    // Send the email
+    mail($to, $subject, $mailbody, $headers);
+    // Go to the thank you page
+    header("location: thankyou.html");
+    exit;
 
-<h3>How does it work?</h3>
+}
+
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta http-equiv="X-UA-Compatible" content="IE=edge"&gt;
+    &lt;title&gt;Contact Us&lt;/title&gt;
+    &lt;link rel="stylesheet" href="styles.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form action="contact.php" method="post" accept-charset="utf-8"&gt;
+     &lt;fieldset&gt;
+         &lt;legend&gt;Contact Us&lt;/legend&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="name"&gt;Name: &lt;/label&gt;
+             &lt;input id="name" type="text" name="name" value=""&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="email"&gt;Email Address: &lt;/label&gt;
+             &lt;input id="email" type="text" name="email" value=""&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;label for="message"&gt;Message:&lt;/label&gt;
+             &lt;textarea id="message" name="message"&gt;&lt;/textarea&gt;
+         &lt;/div&gt;
+         &lt;div class="row"&gt;
+             &lt;input type="submit" value="Submit"&gt;
+         &lt;/div&gt;
+     &lt;/fieldset&gt;
+ &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<h3 id="how-does-it-work%3F">How does it work?</h3>
 
 <p>First we are checking if each of the form fields have been posted.
 If they exist the user has submitted the form.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]))</span> <span class="p">{</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="php">if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
+</code></pre>
 
-
-<p>Next we define where we would like the email to be sent and what the subject of the email should be.<br/>
+<p>Next we define where we would like the email to be sent and what the subject of the email should be.
 Change the <code>$to</code> variable to your own email address.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// The email address the email will be sent to</span>
-</span><span class='line'><span class="nv">$to</span> <span class="o">=</span> <span class="s2">&quot;business@example.com&quot;</span><span class="p">;</span>
-</span><span class='line'><span class="c1">// The email subject</span>
-</span><span class='line'><span class="nv">$subject</span> <span class="o">=</span> <span class="s2">&quot;Contact Form Submission&quot;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="php">// The email address the email will be sent to
+$to = "business@example.com";
+// The email subject
+$subject = "Contact Form Submission";
+</code></pre>
 
 <p>The headers set the email address used for the from in the email.
 The other line indicates the application used to send the email.  In this case php.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// Set the from and reply-to address for the email</span>
-</span><span class='line'><span class="nv">$headers</span> <span class="o">=</span> <span class="s2">&quot;From: website@example.com</span><span class="se">\r\n</span><span class="s2">&quot;</span>
-</span><span class='line'>         <span class="o">.</span> <span class="s2">&quot;X-Mailer: PHP/&quot;</span> <span class="o">.</span> <span class="nb">phpversion</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="php">// Set the from and reply-to address for the email
+$headers = "From: website@example.com\r\n"
+         . "X-Mailer: PHP/" . phpversion();
+</code></pre>
 
 <p>We now need to build the body of the email itself.
 It should include each of the posted values.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// Build the body of the email</span>
-</span><span class='line'><span class="nv">$mailbody</span> <span class="o">=</span> <span class="s2">&quot;The contact form has been filled out.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-</span><span class='line'>          <span class="o">.</span> <span class="s2">&quot;Name: &quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span class='line'>          <span class="o">.</span> <span class="s2">&quot;Email: &quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span class='line'>          <span class="o">.</span> <span class="s2">&quot;Message:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="php">// Build the body of the email
+$mailbody = "The contact form has been filled out.\n\n"
+          . "Name: " . $_POST['name'] . "\n"
+          . "Email: " . $_POST['email'] . "\n"
+          . "Message:\n" . $_POST['message'];
+</code></pre>
 
 <p>Next we use the <a href="http://us3.php.net/manual/en/book.mail.php">php mail</a> function to actually send the email.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// Send the email</span>
-</span><span class='line'><span class="nb">mail</span><span class="p">(</span><span class="nv">$to</span><span class="p">,</span> <span class="nv">$subject</span><span class="p">,</span> <span class="nv">$mailbody</span><span class="p">,</span> <span class="nv">$headers</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="php">// Send the email
+mail($to, $subject, $mailbody, $headers);
+</code></pre>
 
 <p>Finally we send the user to the thankyou.html page that we created.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">// Go to the thank you page</span>
-</span><span class='line'><span class="nx">header</span><span class="p">(</span><span class="s2">&quot;location: thankyou.html&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="k">exit</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="php">// Go to the thank you page
+header("location: thankyou.html");
+exit;
+</code></pre>
 
-
-<h2>Improving the script</h2>
+<h2 id="improving-the-script">Improving the script</h2>
 
 <p>While this script would work as is for your contact form it have a number of problems with it.</p>
 
-<p>The biggest one is that there is no form validation.<br/>
+<p>The biggest one is that there is no form validation.
 A user can submit a blank form and it will send the email and redirect to the thankyou.html page anyway.</p>
 
-<p>The data the user is submitting is not being escaped or filtered.<br/>
+<p>The data the user is submitting is not being escaped or filtered.
 We only want plain text being submitted through the form but without any enforcement of that the user can submit anything including scripts that might cause security issues with certain email clients.</p>
 
-<p>There is nothing to help prevent spam.<br/>
+<p>There is nothing to help prevent spam.
 Once a spam-bot finds this script you could find your inbox full of worthless junk.</p>
 
 <p>In the next part I will tackle some of these issues.</p>
-</div>
 
+        </div>
+        <footer class="post__footer">
+            <ul class="past__meta">
+                <li class="post__byline">Posted by <span class="post__author" itemprop="author">Jonathan Bernardi</span></li>
+                <li>
+                    <time class="post__date--footer" itemprop="datePublished" content="2014-09-01T00:00:00-07:00"
+                          datetime="2014-09-01T00:00:00-07:00">Sep 1st, 2014</time>
+                </li>
+                                    <li>
+                        <span class="post__tags">
+                                                    <a class="post__tag"
+                               href="/tag/mail/">mail</a>,                                                     <a class="post__tag"
+                               href="/tag/php/">php</a>                                                </span>
+                    </li>
+                            </ul>
+            <meta itemprop="url" content="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/">
+                            <meta itemprop="keywords" content="mail, php">
+                                        <meta itemprop="description" content="Building a simple contact form in PHP">
+                    </footer>
 
-  <footer>
-    <p class="meta">
-      
-  
-
-<span class="byline author vcard">Posted by <span class="fn">Jonathan Bernardi</span></span>
-
-      
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-09-01T00:00:00-07:00" pubdate data-updated="true">Sep 1<span>st</span>, 2014</time>
-      
-
-<span class="categories">
-  
-    <a class='category' href='/category/mail/'>mail</a>, <a class='category' href='/category/php/'>php</a>
-  
-</span>
-
-
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/" data-via="thejonbernardi" data-counturl="http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/" >Tweet</a>
-  
-  
-  <div class="g-plusone" data-size="medium"></div>
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/2014/08/secure-password-hashing/" title="Previous Post: Secure Password Hashing with PHP">&laquo; Secure Password Hashing with PHP</a>
-      
-      
-        <a class="basic-alignment right" href="/2014/09/building-a-simple-contact-form-in-php-part-2/" title="Next Post: Building a simple contact form in PHP - Part 2">Building a simple contact form in PHP - Part 2 &raquo;</a>
-      
-    </p>
-  </footer>
-</article>
-
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-  </section>
-
-</div>
-
-<aside class="sidebar">
-  
-    
-<section class="gravatar">
-    <h1>Jonathan Bernardi</h1>
-    <div class="gravatar-image">
-        <img src="http://www.gravatar.com/avatar/7a5252ed2b4a12954535820e06fd0faa" alt="Jonathan Bernardi" />
-    </div>
-    <div class="social-media">
+                    <div class="sharing">
+            <a href="//twitter.com/share" class="twitter-share-button" data-url="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/" data-via="thejonbernardi" data-counturl="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/" >Tweet</a>
+                <div class="g-plusone" data-size="medium"></div>
+        </div>
         
-            <a target="_blank" href="https://twitter.com/thejonbernardi" title="Twitter"><i class="fa fa-twitter"></i></a>
+                    <nav class="pagination pagination--simple">
+                <ul>
+                                            <li class="pagination--simple__previous">
+                            <a href="/2014/08/secure-password-hashing/">&laquo; Secure Password Hashing with PHP</a>
+                        </li>
+                                                                <li class="pagination--simple__next">
+                            <a href="/2014/09/building-a-simple-contact-form-in-php-part-2/">Building a simple contact form in PHP - Part 2 &raquo;</a>
+                        </li>
+                                    </ul>
+            </nav>
         
-        
-        
-            <a target="_blank" href="https://plus.google.com/116642652326925126482" title="Google+"><i class="fa fa-google-plus"></i></a>
-        
-        
-        
-            <a target="_blank" href="http://www.linkedin.com/pub/jonathan-bernardi/57/318/99a" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
-        
-        
-            <a target="_blank" href="https://github.com/spekkionu" title="Github"><i class="fa fa-github"></i></a>
-        
-        
+                    <section class="post__comments">
+    <h2>Comments</h2>
+    <div id="disqus_thread" aria-live="polite">
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
 </section>
-<section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/2014/09/managing-dependencies-with-composer/">Managing Dependencies with Composer</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/09/building-a-simple-contact-form-in-php-part-5/">Building a simple contact form in PHP - Part 5</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/09/building-a-simple-contact-form-in-php-part-4/">Building a simple contact form in PHP - Part 4</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/09/building-a-simple-contact-form-in-php-part-3/">Building a simple contact form in PHP - Part 3</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2014/09/building-a-simple-contact-form-in-php-part-2/">Building a simple contact form in PHP - Part 2</a>
-      </li>
-    
-  </ul>
-</section>
-
-<section class="googleplus googleplus-hidden">
-  <h1>
-    <a href="https://plus.google.com/116642652326925126482?rel=author">
-      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
-      Google+
-    </a>
-  </h1>
-</section>
+        
+    </article>
 
 
-<section>
-  <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/category/doctrine'>doctrine (1)</a></li><li><a href='/category/mail'>mail (5)</a></li><li><a href='/category/mysql'>mysql (2)</a></li><li><a href='/category/pdo'>pdo (1)</a></li><li><a href='/category/php'>php (9)</a></li><li><a href='/category/security'>security (1)</a></li></ul>
-</section><section>
-  <h1>Monthly Archives</h1>
-  <div class="monthly_archive"><ul class="year_list"><li class="year">2014 (9)</li><ul class="month_list"><li class="month"><a href='/2014/09/'>SEP (6)</a></li><li class="month"><a href='/2014/08/'>AUG (3)</a></li></ul></ul></div>
-</section>
-  
+
+    </section>
+    <section class="sidebar">
+    <aside class="widget widget--about">
+    <h4 class="widget__title">Jonathan Bernardi</h4>
+
+    <div class="widget__body">
+        <div class="widget--about__gravatar">
+            <img src="//www.gravatar.com/avatar/7a5252ed2b4a12954535820e06fd0faa" alt="Jonathan Bernardi">
+        </div>
+        <div class="widget--about__social">
+                            <a target="_blank" href="https://twitter.com/thejonbernardi" title="Twitter"><i class="fa fa-twitter"></i></a>
+                                                    <a target="_blank" href="https://plus.google.com/116642652326925126482" title="Google+"><i class="fa fa-google-plus"></i></a>
+                                                    <a target="_blank" href="http://www.linkedin.com/pub/jonathan-bernardi/57/318/99a" title="LinkedIn"><i class="fa fa-linkedin"></i></a>
+                                        <a target="_blank" href="https://github.com/spekkionu" title="Github"><i class="fa fa-github"></i></a>
+                                </div>
+    </div>
+</aside>
+    <aside class="widget widget--monthly">
+    <h4 class="widget__title">Monthly Arhives</h4>
+
+    <div class="widget__body">
+        <ul class="widget--monthly__list">
+                        <li>
+                <a class="widget--monthly__year " href="/2014/">2014 (9)</a>
+
+                                    <ul class="widget--monthly__months">
+                                            <li>
+                            <a class="widget--monthly__month " href="/2014/09/">
+                                Sep
+                                (6)
+                            </a>
+                        </li>
+                                            <li>
+                            <a class="widget--monthly__month " href="/2014/08/">
+                                Aug
+                                (3)
+                            </a>
+                        </li>
+                                        </ul>
+                            </li>
+                    </ul>
+    </div>
 </aside>
 
 
+
+    <aside class="widget widget--tags">
+    <h4 class="widget__title">Tags</h4>
+
+    <div class="widget__body">
+                    <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
+            &nbsp;
+                    <span class="tag size2"><a href="/tag/pdo/">pdo</a></span>
+            &nbsp;
+                    <span class="tag size6"><a href="/tag/mail/">mail</a></span>
+            &nbsp;
+                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
+            &nbsp;
+                    <span class="tag size9"><a href="/tag/php/">php</a></span>
+            &nbsp;
+                    <span class="tag size2"><a href="/tag/security/">security</a></span>
+            &nbsp;
+                    <span class="tag size3"><a href="/tag/database/">database</a></span>
+            &nbsp;
+            </div>
+</aside>
+
+
+
+</section>
+</div>
+<footer class="sitefooter">
+    <div class="content-wrapper">
+        Copyright &copy; 2015 - Jonathan Bernardi
     </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Jonathan Bernardi -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
 </footer>
-  
 
-<script type="text/javascript">
-      var disqus_shortname = 'thedevfiles';
-      
-        
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/';
-        var disqus_url = 'http://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/';
-        var disqus_script = 'embed.js';
-        function disqus_config() {
-            this.callbacks.onNewComment = [function(comment) {
-              ga('send', 'event', 'comment', 'post', 'Post a Comment');
-            }];
-        }
-      
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+            <script type="text/javascript">
+    var disqus_shortname = 'thedevfiles';
+    var disqus_developer = 1;
+    var disqus_identifier = 'https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/';
+    var disqus_title = 'Building a simple contact form in PHP - Part 1';
+    var disqus_url = 'https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/';
+    var disqus_script = 'embed.js';
+    function disqus_config() {
+        this.callbacks.onNewComment = [function (comment) {
+            ga('send', 'event', 'comment', 'post', 'Post a Comment');
+        }];
+    }
     (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     }());
 </script>
+    
+                        <script type="text/javascript">
+        (function() {
+            var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+            script.src = 'https://apis.google.com/js/plusone.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+        })();
+    </script>
+            <script type="text/javascript">
+        (function(){
+            var twitterWidgets = document.createElement('script');
+            twitterWidgets.type = 'text/javascript';
+            twitterWidgets.async = true;
+            twitterWidgets.src = '//platform.twitter.com/widgets.js';
+            document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+        })();
+    </script>
+        <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+        ga('create', 'UA-35809975-1', 'auto');
+        ga('require', 'displayfeatures');
+        ga('send', 'pageview');
 
-
-
-
-  <script type="text/javascript">
-    (function() {
-      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
-      script.src = 'https://apis.google.com/js/plusone.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
-    })();
-  </script>
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-35809975-1', 'auto');
-  ga('require', 'displayfeatures');
-  ga('send', 'pageview');
-
-</script>
-
-
-<script src="/javascripts/monthly_archive.min.js"></script>
-
+    </script>
 </body>
 </html>
