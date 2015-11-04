@@ -93,7 +93,7 @@
             <h1 class="post__title p-name" itemprop="headline">Building a simple contact form in PHP - Part 4</h1>
 
             <h2 class="post__date">Sep 4th, 2014</h2>
-                            <meta class="u-photo" itemprop="image" content="https://www.thedevfiles.com/images/featured/contact-form.png">
+                            <meta class="u-photo" itemprop="image" content="https://www.thedevfiles.com/assets/images/featured/contact-form-recaptcha.png">
                     </header>
         <div class="post__body e-content" itemprop="articleBody">
             <p>In of <a href="/2014/09/building-a-simple-contact-form-in-php-part-3/">part 3</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">Building a simple contact form in PHP</a> we added client-side validation to our form.</p>
@@ -305,7 +305,7 @@ Add the following where we initialize our <code>$errors</code> and <code>$valid<
 
 <p>The reCAPTCHA field should show up on the form but wont do anything until we add code to check the posted value.</p>
 
-<p><img src="/images/contact-form/part-4/reCAPTCHA.png" alt="reCAPTCHA" /></p>
+<p><img src="/assets/images/contact-form/part-4/reCAPTCHA.png" alt="reCAPTCHA" /></p>
 
 <p>Add another check to make sure a value was posted by changing the line that checks the other posted variables to the following.</p>
 
@@ -560,19 +560,19 @@ if (isset($_POST['recaptcha_challenge_field'],$_POST['recaptcha_response_field']
     <h4 class="widget__title">Tags</h4>
 
     <div class="widget__body">
+                    <span class="tag size2"><a href="/tag/security/">security</a></span>
+            &nbsp;
+                    <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
+            &nbsp;
+                    <span class="tag size6"><a href="/tag/mail/">mail</a></span>
+            &nbsp;
                     <span class="tag size9"><a href="/tag/php/">php</a></span>
             &nbsp;
                     <span class="tag size2"><a href="/tag/pdo/">pdo</a></span>
             &nbsp;
-                    <span class="tag size2"><a href="/tag/security/">security</a></span>
-            &nbsp;
-                    <span class="tag size6"><a href="/tag/mail/">mail</a></span>
-            &nbsp;
-                    <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
+                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
             &nbsp;
                     <span class="tag size3"><a href="/tag/database/">database</a></span>
-            &nbsp;
-                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
             &nbsp;
             </div>
 </aside>

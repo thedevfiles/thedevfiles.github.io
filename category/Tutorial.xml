@@ -3,7 +3,7 @@
     <title><![CDATA[The Dev Files]]></title>
     <link href="https://www.thedevfiles.com/category/Tutorial.xml" rel="self"/>
     <link href="https://www.thedevfiles.com/"/>
-    <updated>2015-11-03T20:14:16-08:00</updated>
+    <updated>2015-11-03T20:45:39-08:00</updated>
     <id>https://www.thedevfiles.com/</id>
             <author>
             <name><![CDATA[Jonathan Bernardi]]></name>            <email><![CDATA[jon@jonbernardi.com]]></email>        </author>
@@ -678,7 +678,7 @@ Add the following where we initialize our <code>$errors</code> and <code>$valid<
 
 <p>The reCAPTCHA field should show up on the form but wont do anything until we add code to check the posted value.</p>
 
-<p><img src="/images/contact-form/part-4/reCAPTCHA.png" alt="reCAPTCHA" /></p>
+<p><img src="/assets/images/contact-form/part-4/reCAPTCHA.png" alt="reCAPTCHA" /></p>
 
 <p>Add another check to make sure a value was posted by changing the line that checks the other posted variables to the following.</p>
 
@@ -978,7 +978,7 @@ Depending on your browser you should see a message telling you to fill out a req
 
 <p>Here is what it looks like in Google Chrome.</p>
 
-<p><img src="/images/contact-form/part-3/html5-validation.png" alt="HTML5 Validation" /></p>
+<p><img src="/assets/images/contact-form/part-3/html5-validation.png" alt="HTML5 Validation" /></p>
 
 <p>Now change the email input type from <code>text</code> to <code>email</code> so it looks like the following.</p>
 
@@ -989,7 +989,7 @@ Depending on your browser you should see a message telling you to fill out a req
 
 <p>Here is what I see in Google Chrome.</p>
 
-<p><img src="/images/contact-form/part-3/html5-email-validation.png" alt="HTML5 Validation" /></p>
+<p><img src="/assets/images/contact-form/part-3/html5-email-validation.png" alt="HTML5 Validation" /></p>
 
 <p>This also has the benefit of showing an email-specific keyboard on many mobile devices when the email field is filled out.</p>
 
@@ -1038,7 +1038,7 @@ ul.parsley-errors-list li{
 }
 </code></pre>
 
-<p><img src="/images/contact-form/part-3/parsely-validation.png" alt="HTML5 Validation" /></p>
+<p><img src="/assets/images/contact-form/part-3/parsely-validation.png" alt="HTML5 Validation" /></p>
 
 <h3 id="customizing-error-messages">Customizing error messages</h3>
 
@@ -1063,7 +1063,7 @@ It should look like the following.</p>
 
 <p>Now the custom messages you provided will be displayed instead of the default <code>This value is required.</code> message.</p>
 
-<p><img src="/images/contact-form/part-3/parsely-messages.png" alt="HTML5 Validation" /></p>
+<p><img src="/assets/images/contact-form/part-3/parsely-messages.png" alt="HTML5 Validation" /></p>
 
 <p>The full <code>contact.php</code> should now look like the following.</p>
 
@@ -1499,7 +1499,7 @@ While we are sending plain text emails we don't want to trust that whatever emai
 
 <p>Now anywhere in the validation or email sending code that references <code>$_POST</code> should be changed to <code>$contact</code></p>
 
-<p><img src="/images/contact-form/part-2/validation.png" alt="Form Validation" /></p>
+<p><img src="/assets/images/contact-form/part-2/validation.png" alt="Form Validation" /></p>
 
 <h3 id="using-the-posted-email-address-as-the-reply-to-address">Using the posted email address as the Reply-To address</h3>
 
@@ -1702,7 +1702,7 @@ textarea {
 
 <p>If you view the page in a browser it should look something like this.</p>
 
-<p><img src="/images/contact-form/part-1/contact-form.png" alt="Contact Form" /></p>
+<p><img src="/assets/images/contact-form/part-1/contact-form.png" alt="Contact Form" /></p>
 
 <p>Not the prettiest form but this isn't a design tutorial.
 Feel free to add your own styles.</p>
