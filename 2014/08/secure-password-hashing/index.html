@@ -90,7 +90,9 @@
             <h1 class="post__title p-name" itemprop="headline">Secure Password Hashing with PHP</h1>
 
             <h2 class="post__date">Aug 22nd, 2014</h2>
-                            <meta class="u-photo" itemprop="image" content="https://www.thedevfiles.com/assets/images/featured/Black_Lock.png">
+                            <div itemprop="image" itemscope itemtype="http://schema.org/ImageObject">
+                    <meta class="u-photo" itemprop="contentUrl" content="https://www.thedevfiles.com">
+                </div>
                     </header>
         <div class="post__body e-content" itemprop="articleBody">
             <p>There is a lot of misinformation and uncertainty on the topic of password storage.</p>
@@ -266,6 +268,13 @@ class UserModel
 
         </div>
         <footer class="post__footer">
+            <div itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+                <meta itemprop="name" content="The Dev Files">
+            </div>
+            <meta itemprop="dateModified" content="2014-08-22T00:00:00-07:00">
+            <meta itemprop="mainEntityOfPage" content="https://www.thedevfiles.com/2014/08/secure-password-hashing/">
+
+
             <ul class="past__meta">
                 <li class="post__byline">Posted by <span class="post__author p-author h-card" itemprop="author">Jonathan Bernardi</span></li>
                 <li>
@@ -361,19 +370,19 @@ class UserModel
     <h4 class="widget__title">Tags</h4>
 
     <div class="widget__body">
-                    <span class="tag size2"><a href="/tag/security/">security</a></span>
-            &nbsp;
-                    <span class="tag size6"><a href="/tag/mail/">mail</a></span>
+                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
             &nbsp;
                     <span class="tag size2"><a href="/tag/pdo/">pdo</a></span>
             &nbsp;
-                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
+                    <span class="tag size3"><a href="/tag/database/">database</a></span>
+            &nbsp;
+                    <span class="tag size6"><a href="/tag/mail/">mail</a></span>
+            &nbsp;
+                    <span class="tag size2"><a href="/tag/security/">security</a></span>
             &nbsp;
                     <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
             &nbsp;
                     <span class="tag size9"><a href="/tag/php/">php</a></span>
-            &nbsp;
-                    <span class="tag size3"><a href="/tag/database/">database</a></span>
             &nbsp;
             </div>
 </aside>
