@@ -3,7 +3,7 @@
     <title><![CDATA[The Dev Files]]></title>
     <link href="https://www.thedevfiles.com/atom.xml" rel="self"/>
     <link href="https://www.thedevfiles.com/"/>
-    <updated>2016-06-16T09:31:26-07:00</updated>
+    <updated>2016-08-12T20:52:19-07:00</updated>
     <id>https://www.thedevfiles.com/</id>
             <author>
             <name><![CDATA[Jonathan Bernardi]]></name>            <email><![CDATA[jon@jonbernardi.com]]></email>        </author>
@@ -2331,9 +2331,9 @@ $sth-&gt;execute();
 $user = $sth-&gt;fetchAssoc();
 
 $sth = $dbh-&gt;prepare("UPDATE users SET name = :name, email = :email WHERE id = :id");
-$sth-&gt;bindeValue(":name", $name);
-$sth-&gt;bindeValue(":email", $email);
-$sth-&gt;bindeValue(":id", $id, PDO::PARAM_INT);
+$sth-&gt;bindValue(":name", $name);
+$sth-&gt;bindValue(":email", $email);
+$sth-&gt;bindValue(":id", $id, PDO::PARAM_INT);
 $sth-&gt;execute();
 </code></pre>
 
