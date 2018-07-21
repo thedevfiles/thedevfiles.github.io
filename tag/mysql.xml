@@ -3,16 +3,16 @@
     <title><![CDATA[The Dev Files]]></title>
     <link href="https://www.thedevfiles.com/tag/mysql.xml" rel="self"/>
     <link href="https://www.thedevfiles.com/"/>
-    <updated>2016-08-15T00:33:19-07:00</updated>
+    <updated>2018-07-20T23:36:09-07:00</updated>
     <id>https://www.thedevfiles.com/</id>
             <author>
             <name><![CDATA[Jonathan Bernardi]]></name>            <email><![CDATA[jon@jonbernardi.com]]></email>        </author>
         <generator uri="http://sculpin.io/">Sculpin</generator>
             <entry>
             <title type="html"><![CDATA[Moving from mysql_query to PDO]]></title>
-            <link href="https://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo/"/>
+            <link href="https://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo//"/>
             <updated>2014-08-08T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo</id>
+            <id>https://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo/</id>
             <summary><![CDATA[The php mysql extension has been marked as deprecated. This article will introduce PDO as a replacement.]]></summary>            <content type="html"><![CDATA[<p>The mysql extension has been marked as deprecated as of php 5.5.0 and will be removed completely in a future version.</p>
 
 <p>It is old and not very user friendly.</p>

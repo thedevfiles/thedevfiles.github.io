@@ -3,7 +3,7 @@
     <title><![CDATA[The Dev Files]]></title>
     <link href="https://www.thedevfiles.com/category/Tutorial.xml" rel="self"/>
     <link href="https://www.thedevfiles.com/"/>
-    <updated>2016-08-15T00:33:19-07:00</updated>
+    <updated>2018-07-20T23:36:09-07:00</updated>
     <id>https://www.thedevfiles.com/</id>
             <author>
             <name><![CDATA[Jonathan Bernardi]]></name>            <email><![CDATA[jon@jonbernardi.com]]></email>        </author>
@@ -12,7 +12,7 @@
             <title type="html"><![CDATA[Building a simple contact form in PHP - Part 5]]></title>
             <link href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5/"/>
             <updated>2014-09-05T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5</id>
+            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5/</id>
             <summary><![CDATA[Using Swift to send email notifications on contact form submissions.]]></summary>            <content type="html"><![CDATA[<p>In of <a href="/2014/09/building-a-simple-contact-form-in-php-part-4/">part 4</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">Building a simple contact form in PHP</a> we added a CAPCHA field to help reduce spam.</p>
 
 <p>In this part we are going to change the sending of the mail to use SMTP by using <a href="http://swiftmailer.org/">Swift Mailer</a>, a php mailing library.</p>
@@ -468,7 +468,7 @@ For Mandrill you can find this under <code>Settings</code>.</p>
             <title type="html"><![CDATA[Building a simple contact form in PHP - Part 4]]></title>
             <link href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4/"/>
             <updated>2014-09-04T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4</id>
+            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-4/</id>
             <summary><![CDATA[Adding a reCAPTCHA field to a php contact form]]></summary>            <content type="html"><![CDATA[<p>In of <a href="/2014/09/building-a-simple-contact-form-in-php-part-3/">part 3</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">Building a simple contact form in PHP</a> we added client-side validation to our form.</p>
 
 <p>In this part we are going to add a <a href="http://en.wikipedia.org/wiki/Captcha">CAPTCHA</a> field to the form in order to reduce spam.</p>
@@ -841,7 +841,7 @@ if (isset($_POST['recaptcha_challenge_field'],$_POST['recaptcha_response_field']
             <title type="html"><![CDATA[Building a simple contact form in PHP - Part 3]]></title>
             <link href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/"/>
             <updated>2014-09-03T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3</id>
+            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-3/</id>
             <summary><![CDATA[Adding client-side form validation to a php contact form.]]></summary>            <content type="html"><![CDATA[<p>As we last left it in <a href="/2014/09/building-a-simple-contact-form-in-php-part-2/">part 2</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">Building a simple contact form in PHP</a> we added server-side form validation to our contact form and input filtering to the submitted data before sending out the email.</p>
 
 <p>In this part we are going to add some client-side validation to our contact form.</p>
@@ -1171,7 +1171,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
             <title type="html"><![CDATA[Building a simple contact form in PHP - Part 2]]></title>
             <link href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-2/"/>
             <updated>2014-09-02T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-2</id>
+            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-2/</id>
             <summary><![CDATA[Adding server-side form validation to a php contact form.]]></summary>            <content type="html"><![CDATA[<p>In <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">part 1</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">Building a simple contact form in PHP</a> we built a simple contact form that sends a notification when the form is posted with the values the user posted.</p>
 
 <p>As we discussed at the end of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">part 1</a> there are a few problems with our contact form.</p>
@@ -1624,7 +1624,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
             <title type="html"><![CDATA[Building a simple contact form in PHP - Part 1]]></title>
             <link href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/"/>
             <updated>2014-09-01T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1</id>
+            <id>https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/</id>
             <summary><![CDATA[Building a simple contact form in PHP]]></summary>            <content type="html"><![CDATA[<p>In this series we will be building a simple contact form in php.</p>
 
 <p>It will cover sending emails and form validation.</p>

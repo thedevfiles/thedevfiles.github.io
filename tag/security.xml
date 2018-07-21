@@ -3,16 +3,16 @@
     <title><![CDATA[The Dev Files]]></title>
     <link href="https://www.thedevfiles.com/tag/security.xml" rel="self"/>
     <link href="https://www.thedevfiles.com/"/>
-    <updated>2016-08-15T00:33:19-07:00</updated>
+    <updated>2018-07-20T23:36:09-07:00</updated>
     <id>https://www.thedevfiles.com/</id>
             <author>
             <name><![CDATA[Jonathan Bernardi]]></name>            <email><![CDATA[jon@jonbernardi.com]]></email>        </author>
         <generator uri="http://sculpin.io/">Sculpin</generator>
             <entry>
             <title type="html"><![CDATA[Secure Password Hashing with PHP]]></title>
-            <link href="https://www.thedevfiles.com/2014/08/secure-password-hashing/"/>
+            <link href="https://www.thedevfiles.com/2014/08/secure-password-hashing//"/>
             <updated>2014-08-22T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/08/secure-password-hashing</id>
+            <id>https://www.thedevfiles.com/2014/08/secure-password-hashing/</id>
             <summary><![CDATA[The password_hash function added in PHP 5.5 makes secure password hashing easy.]]></summary>            <content type="html"><![CDATA[<p>There is a lot of misinformation and uncertainty on the topic of password storage.</p>
 
 <p>There are massive amounts of tutorials and articles recommending all manor of methods of storing passwords.

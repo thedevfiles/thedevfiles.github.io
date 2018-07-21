@@ -3,16 +3,16 @@
     <title><![CDATA[The Dev Files]]></title>
     <link href="https://www.thedevfiles.com/tag/database.xml" rel="self"/>
     <link href="https://www.thedevfiles.com/"/>
-    <updated>2016-08-15T00:33:19-07:00</updated>
+    <updated>2018-07-20T23:36:09-07:00</updated>
     <id>https://www.thedevfiles.com/</id>
             <author>
             <name><![CDATA[Jonathan Bernardi]]></name>            <email><![CDATA[jon@jonbernardi.com]]></email>        </author>
         <generator uri="http://sculpin.io/">Sculpin</generator>
             <entry>
             <title type="html"><![CDATA[Simplifying database interactions with Doctrine DBAL]]></title>
-            <link href="https://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal/"/>
+            <link href="https://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal//"/>
             <updated>2014-08-15T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal</id>
+            <id>https://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal/</id>
             <summary><![CDATA[This article will introduce Doctrine DBAL for a more user friendly developer experience than straight PDO.]]></summary>            <content type="html"><![CDATA[<p>I previously wrote about <a href="/2014/08/moving-from-mysql-query-to-pdo/">switching from the mysql extension to PDO</a>.
 PDO introduces a number of convenient features beyond the mysql extension such as transactions, prepared statements, and more fetching options.
 However there are still a few things that are a bit painful.</p>
@@ -296,9 +296,9 @@ for other pieces of functionality such as events, a schema manager, caching, sha
         </entry>
             <entry>
             <title type="html"><![CDATA[Moving from mysql_query to PDO]]></title>
-            <link href="https://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo/"/>
+            <link href="https://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo//"/>
             <updated>2014-08-08T00:00:00-07:00</updated>
-            <id>https://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo</id>
+            <id>https://www.thedevfiles.com/2014/08/moving-from-mysql-query-to-pdo/</id>
             <summary><![CDATA[The php mysql extension has been marked as deprecated. This article will introduce PDO as a replacement.]]></summary>            <content type="html"><![CDATA[<p>The mysql extension has been marked as deprecated as of php 5.5.0 and will be removed completely in a future version.</p>
 
 <p>It is old and not very user friendly.</p>
