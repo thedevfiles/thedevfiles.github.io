@@ -17,7 +17,7 @@
                 <link rel="first" href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-1/">
                 <link rel="last" href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5/">
         <link rel="author" href="/contact/">
-    <link href="/assets/css/style.css?v=1539463970" rel="stylesheet" type="text/css"/>
+    <link href="/assets/css/style.css?v=1539468797" rel="stylesheet" type="text/css"/>
     <link rel="preload" href="https://thedevfiles.disqus.com" as="script">
     <link rel="preload" href="https://www.googletagmanager.com" as="script">
     <link rel="preload" href="https://www.google-analytics.com" as="script">
@@ -69,7 +69,7 @@
         gtag('config', 'UA-35809975-1');
     </script>
 </head>
-<body itemscope itemtype="http://schema.org/Blog">
+<body itemscope itemtype="http://schema.org/WebPage">
 <header class="siteheader">
     <div class="container">
         <h2 class="siteheader__title"><a href="/">The Dev Files</a></h2>
@@ -78,19 +78,19 @@
 </header>
 <div class="menu menu--main">
     <div class="container content-wrapper">
-        <nav class="menu__nav main-column" role="navigation">
+        <nav class="menu__nav main-column" role="navigation" aria-label="Navigation" itemscope itemtype="https://schema.org/SiteNavigationElement">
     <ul class="menu__links">
         <li class="menu__item">
-            <a class="menu__link" href="/">Blog</a>
+            <a itemprop="url" class="menu__link" href="/">Blog</a>
         </li>
         <li class="menu__item">
-            <a class="menu__link" href="/archive/">Archive</a>
+            <a itemprop="url" class="menu__link" href="/archive/">Archive</a>
         </li>
         <li class="menu__item">
-            <a class="menu__link" href="/contact/">Contact</a>
+            <a itemprop="url" class="menu__link" href="/contact/">Contact</a>
         </li>
         <li class="menu__item menu__item--rss">
-            <a class="menu__link" href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">
+            <a itemprop="url" class="menu__link" href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">
                 <svg height="18" aria-hidden="true" data-prefix="fas" data-icon="rss" class="svg-inline--fa fa-rss fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M128.081 415.959c0 35.369-28.672 64.041-64.041 64.041S0 451.328 0 415.959s28.672-64.041 64.041-64.041 64.04 28.673 64.04 64.041zm175.66 47.25c-8.354-154.6-132.185-278.587-286.95-286.95C7.656 175.765 0 183.105 0 192.253v48.069c0 8.415 6.49 15.472 14.887 16.018 111.832 7.284 201.473 96.702 208.772 208.772.547 8.397 7.604 14.887 16.018 14.887h48.069c9.149.001 16.489-7.655 15.995-16.79zm144.249.288C439.596 229.677 251.465 40.445 16.503 32.01 7.473 31.686 0 38.981 0 48.016v48.068c0 8.625 6.835 15.645 15.453 15.999 191.179 7.839 344.627 161.316 352.465 352.465.353 8.618 7.373 15.453 15.999 15.453h48.068c9.034-.001 16.329-7.474 16.005-16.504z"></path></svg>
                 <span class="sr-only">RSS</span>
             </a>
@@ -109,16 +109,18 @@
 
 <div class="middle-section">
     <div class="container content-wrapper">
-        <section class="main main-column">
+        <main aria-label="Main content" class="main main-column" itemscope itemtype="https://schema.org/Blog">
 
                 <article class="post card h-entry" itemid="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-2/" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
 
         <header class="post__header">
-            <h1 class="post__title card__title p-name" itemprop="headline">Building a simple contact form in PHP - Part 2</h1>
+            <h1 class="post__title card__title p-name" itemprop="headline name">Building a simple contact form in PHP - Part 2</h1>
 
             <h2 class="post__date">Sep 2nd, 2014</h2>
-                            <img class="u-photo hidden" itemprop="image" src="https://www.thedevfiles.com/assets/images/featured/contact-form-validation.png" alt="Building a simple contact form in PHP - Part 2">
-                    </header>
+                <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+        <meta itemprop="url" alt="Building a simple contact form in PHP - Part 2" content="https://www.thedevfiles.com/assets/images/featured/contact-form-validation.png">
+        <meta itemprop="width" content="466">        <meta itemprop="height" content="478">    </div>
+        </header>
         <div class="post__body e-content" itemprop="articleBody">
             <p>In <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">part 1</a> of <a href="/2014/09/building-a-simple-contact-form-in-php-part-1/">Building a simple contact form in PHP</a> we built a simple contact form that sends a notification when the form is posted with the values the user posted.</p>
 
@@ -569,14 +571,17 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
 
         </div>
         <footer class="post__footer">
-            <div itemprop="publisher" itemscope itemtype="http://schema.org/Person">
-                <meta itemprop="givenName" content="Jonathan">
-                <meta itemprop="familyName" content="Bernardi">
-            </div>
+            <div itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="The Dev Files">
+    <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+        <meta itemprop="url" content="https://www.thedevfiles.com/assets/images/favicon/512x512.png">
+        <meta itemprop="width" content="512">
+        <meta itemprop="height" content="512">
+    </div>
+</div>
             <meta itemprop="dateModified" content="2014-09-02T00:00:00-07:00">
             <meta itemprop="mainEntityOfPage" content="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-2/">
             <meta class="u-url" itemprop="url" content="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-2/">
-
 
             <ul class="past__meta">
                 <li class="post__byline">Posted by <span class="post__author p-author h-card" itemprop="author">Jonathan Bernardi</span></li>
@@ -623,7 +628,7 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
 
 
 
-        </section>
+        </main>
         <section class="sidebar sidebar-column">
     <aside class="widget widget--about h-card">
     <h4 class="widget__title p-name">Jonathan Bernardi</h4>
@@ -696,19 +701,19 @@ if (isset($_POST['name'], $_POST['email'], $_POST['message'])) {
     <h4 class="widget__title">Tags</h4>
 
     <div class="widget__body">
+                    <span class="tag size9"><a href="/tag/php/">php</a></span>
+            &nbsp;
                     <span class="tag size6"><a href="/tag/mail/">mail</a></span>
-            &nbsp;
-                    <span class="tag size2"><a href="/tag/pdo/">pdo</a></span>
-            &nbsp;
-                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
-            &nbsp;
-                    <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
             &nbsp;
                     <span class="tag size3"><a href="/tag/database/">database</a></span>
             &nbsp;
+                    <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
+            &nbsp;
+                    <span class="tag size2"><a href="/tag/pdo/">pdo</a></span>
+            &nbsp;
                     <span class="tag size2"><a href="/tag/security/">security</a></span>
             &nbsp;
-                    <span class="tag size9"><a href="/tag/php/">php</a></span>
+                    <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
             &nbsp;
             </div>
 </aside>
