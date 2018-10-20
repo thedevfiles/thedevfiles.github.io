@@ -15,7 +15,7 @@
                 <link rel="next" href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-2/">
                     <link rel="last" href="https://www.thedevfiles.com/2014/09/building-a-simple-contact-form-in-php-part-5/">
         <link rel="author" href="/contact/">
-    <link href="/assets/css/style.css?v=1540026836" rel="stylesheet" type="text/css"/>
+    <link href="/assets/css/style.css?v=1540027657" rel="stylesheet" type="text/css"/>
     <link rel="preload" href="https://thedevfiles.disqus.com" as="script">
     <link rel="preload" href="https://www.googletagmanager.com" as="script">
     <link rel="preload" href="https://www.google-analytics.com" as="script">
@@ -39,25 +39,9 @@
 <link rel="apple-touch-icon" sizes="512x512" href="/assets/images/favicon/512x512.png">
 <link rel="apple-touch-icon" sizes="1024x1024" href="/assets/images/favicon/1024x1024.png">
 <link rel="apple-touch-icon" sizes="2048x2048" href="/assets/images/favicon/2048x2048.png">
-    <noscript id="deferred-styles">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/solarized-dark.min.css" integrity="sha256-90Y+fvi28WF+3jKH4tHEkoQ9WLeFKJjpvCPNOtU9ZvU=" crossorigin="anonymous" />
-    </noscript>
     <link rel="alternate" type="application/atom+xml" href="/atom.xml"
           title="The Dev Files activity feed"/>
-            <script>
-        var loadDeferredStyles = function() {
-            var addStylesNode = document.getElementById("deferred-styles");
-            var replacement = document.createElement("div");
-            replacement.innerHTML = addStylesNode.textContent;
-            document.body.appendChild(replacement)
-            addStylesNode.parentElement.removeChild(addStylesNode);
-        };
-        var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-            window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-        if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
-        else window.addEventListener('load', loadDeferredStyles);
-    </script>
-                <!-- Global site tag (gtag.js) - Google Analytics -->
+                        <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-35809975-1"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -510,17 +494,17 @@ Once a spam-bot finds this script you could find your inbox full of worthless ju
     <h4 class="widget__title">Tags</h4>
 
     <div class="widget__body">
-                    <span class="tag size6"><a href="/tag/mail/">mail</a></span>
-            &nbsp;
                     <span class="tag size2"><a href="/tag/doctrine/">doctrine</a></span>
             &nbsp;
+                    <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
+            &nbsp;
                     <span class="tag size3"><a href="/tag/database/">database</a></span>
+            &nbsp;
+                    <span class="tag size6"><a href="/tag/mail/">mail</a></span>
             &nbsp;
                     <span class="tag size2"><a href="/tag/security/">security</a></span>
             &nbsp;
                     <span class="tag size2"><a href="/tag/pdo/">pdo</a></span>
-            &nbsp;
-                    <span class="tag size2"><a href="/tag/mysql/">mysql</a></span>
             &nbsp;
                     <span class="tag size9"><a href="/tag/php/">php</a></span>
             &nbsp;
@@ -540,8 +524,12 @@ Once a spam-bot finds this script you could find your inbox full of worthless ju
 
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
-<script>hljs.initHighlightingOnLoad();</script>
+<script async defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js?onload=highlightLoaded" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+<script>
+function highlightLoaded(){
+    hljs.initHighlightingOnLoad();
+}
+</script>
 
 
             <script type="text/javascript">
