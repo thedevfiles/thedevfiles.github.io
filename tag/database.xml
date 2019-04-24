@@ -3,7 +3,7 @@
     <title><![CDATA[The Dev Files]]></title>
     <link href="https://www.thedevfiles.com/tag/database.xml" rel="self"/>
     <link href="https://www.thedevfiles.com/"/>
-    <updated>2018-10-20T02:59:53-07:00</updated>
+    <updated>2019-04-24T09:11:20-07:00</updated>
     <id>https://www.thedevfiles.com/</id>
             <author>
             <name><![CDATA[Jonathan Bernardi]]></name>            <email><![CDATA[jon@jonbernardi.com]]></email>        </author>
@@ -733,7 +733,6 @@ if(!in_array($column, $allowed)){
     // throw an error and do not execute the query.
 } else {
     $sth = $dbh-&gt;prepare("SELECT * FROM users where $column = :value");
-    $sth-&gt;bindValue(':column', $column);
     $sth-&gt;bindValue(':value', $value);
     $sth-&gt;execute();
 }
